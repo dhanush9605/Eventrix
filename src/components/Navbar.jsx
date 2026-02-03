@@ -46,13 +46,39 @@ const Navbar = () => {
                     <Link to="/login" style={{ color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Schedule</Link>
                     <Link to="/login" style={{ color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.1em' }}>About</Link>
 
-                    <div style={{ display: 'flex', gap: '1rem', marginLeft: '1rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginLeft: '1rem', alignItems: 'center' }}>
                         {user ? (
-                            <button onClick={logout} className="btn btn-secondary" style={{ padding: '0.6rem 1.5rem', textDecoration: 'none' }}>Logout</button>
+                            <>
+                                <Link
+                                    to={user.role === 'admin' ? '/admin/overview' : user.role === 'faculty' ? '/faculty/analytics' : '/student/dashboard'}
+                                    className="btn btn-primary"
+                                    style={{ padding: '0.6rem 1.5rem', textDecoration: 'none', fontSize: '0.8rem' }}
+                                >
+                                    Dashboard
+                                </Link>
+                                <button
+                                    onClick={logout}
+                                    style={{
+                                        background: 'none',
+                                        border: '1px solid #333',
+                                        color: '#aaa',
+                                        padding: '0.6rem 1.2rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseOver={(e) => { e.target.style.borderColor = '#d32f2f'; e.target.style.color = 'white'; }}
+                                    onMouseOut={(e) => { e.target.style.borderColor = '#333'; e.target.style.color = '#aaa'; }}
+                                >
+                                    Logout
+                                </button>
+                            </>
                         ) : (
                             <>
-                                <Link to="/login" className="btn btn-secondary" style={{ padding: '0.6rem 1.5rem', textDecoration: 'none' }}>Login</Link>
-                                <Link to="/register/student" className="btn btn-primary" style={{ padding: '0.6rem 1.5rem', textDecoration: 'none' }}>Register</Link>
+                                <Link to="/login" className="btn btn-secondary" style={{ padding: '0.6rem 1.5rem', textDecoration: 'none', fontSize: '0.8rem' }}>Login</Link>
+                                <Link to="/register/student" className="btn btn-primary" style={{ padding: '0.6rem 1.5rem', textDecoration: 'none', fontSize: '0.8rem' }}>Register</Link>
                             </>
                         )}
                     </div>

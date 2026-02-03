@@ -1,82 +1,47 @@
 import React, { useState } from 'react';
+import { useEvents } from '../../context/EventContext';
+import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { Calendar, MapPin, Clock, Filter, Search } from 'lucide-react';
+import { Calendar, MapPin, Clock, Filter, Search, X, Check } from 'lucide-react';
 
 const StudentEvents = () => {
+    const { events, registerForEvent } = useEvents();
+    const { user } = useAuth();
     const [filter, setFilter] = useState('all');
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [registering, setRegistering] = useState(false);
 
-    const events = [
-        {
-            id: 1,
-            title: 'AI Workshop 2024',
-            date: 'Oct 24, 2024',
-            time: '10:00 AM - 12:00 PM',
-            location: 'Main Auditorium',
-            category: 'Workshop',
-            status: 'Live',
-            image: 'https://images.unsplash.com/photo-1591453089816-0fbb971b454c?q=80&w=400&auto=format&fit=crop',
-            description: 'Dive deep into the world of Artificial Intelligence with industry experts.'
-        },
-        {
-            id: 2,
-            title: 'Annual Tech Symposium',
-            date: 'Oct 24, 2024',
-            time: '09:00 AM - 05:00 PM',
-            location: 'Virtual Hall A',
-            category: 'Conference',
-            status: 'Live',
-            image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400&auto=format&fit=crop',
-            description: 'A day filled with talks, panels, and networking opportunities for tech enthusiasts.'
-        },
-        {
-            id: 3,
-            title: 'Hackathon Finals',
-            date: 'Oct 25, 2024',
-            time: '10:00 AM',
-            location: 'Innovation Lab',
-            category: 'Competition',
-            status: 'Upcoming',
-            image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=400&auto=format&fit=crop',
-            description: 'Witness the top teams compete for the grand prize in our annual hackathon.'
-        },
-        {
-            id: 4,
-            title: 'Web3 Fundamentals',
-            date: 'Oct 28, 2024',
-            time: '02:00 PM',
-            location: 'Room 304',
-            category: 'Seminar',
-            status: 'Upcoming',
-            image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=400&auto=format&fit=crop',
-            description: 'Understanding the building blocks of the decentralized web.'
-        },
-        {
-            id: 5,
-            title: 'Career Fair Spring',
-            date: 'Nov 05, 2024',
-            time: '09:00 AM',
-            location: 'University Grounds',
-            category: 'Career',
-            status: 'Upcoming',
-            image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=400&auto=format&fit=crop',
-            description: 'Connect with top employers and explore internship opportunities.'
-        },
-        {
-            id: 6,
-            title: 'Intro to Robotics',
-            date: 'Sep 15, 2024',
-            time: 'Completed',
-            location: 'Lab 2',
-            category: 'Workshop',
-            status: 'Past',
-            image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400&auto=format&fit=crop',
-            description: 'Hands-on workshop on building your first robot.'
-        }
-    ];
+    // Filter only active events for students
+    const activeEvents = events.filter(e => e.status === 'active');
 
     const filteredEvents = filter === 'all'
-        ? events
-        : events.filter(e => e.status.toLowerCase() === filter.toLowerCase());
+        ? activeEvents
+        : activeEvents.filter(e => e.category.toLowerCase() === filter.toLowerCase());
+
+    const handleRegisterClick = (event) => {
+        if (event.isPaid) {
+            setSelectedEvent(event);
+            setShowPaymentModal(true);
+        } else {
+            handleRegistration(event.id);
+        }
+    };
+
+    const handleRegistration = (eventId) => {
+        setRegistering(true);
+        // Simulate network request
+        setTimeout(() => {
+            const result = registerForEvent(eventId, user);
+            setRegistering(false);
+            if (result.success) {
+                alert("Successfully registered!");
+                setShowPaymentModal(false);
+            } else {
+                alert(result.message);
+            }
+        }, 1000);
+    };
 
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
@@ -92,7 +57,7 @@ const StudentEvents = () => {
             {/* Filters and Controls */}
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    {['all', 'live', 'upcoming', 'past'].map(f => (
+                    {['all', 'Technical', 'Workshop', 'Cultural', 'Seminar'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
@@ -132,7 +97,12 @@ const StudentEvents = () => {
                         flexDirection: 'column'
                     }}>
                         <div style={{ position: 'relative', height: '160px' }}>
-                            <img src={event.image} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
+                            {event.bannerImage ? (
+                                <img src={event.bannerImage} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
+                            ) : (
+                                <div style={{ width: '100%', height: '100%', backgroundColor: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444' }}>No Image</div>
+                            )}
+
                             <div style={{
                                 position: 'absolute',
                                 top: '12px',
@@ -142,12 +112,11 @@ const StudentEvents = () => {
                                 borderRadius: '4px',
                                 fontSize: '0.65rem',
                                 fontWeight: 'bold',
-                                border: `1px solid ${getStatusColor(event.status)}`,
-                                color: getStatusColor(event.status),
+                                border: event.isPaid ? '1px solid #ffa000' : '1px solid #4caf50',
+                                color: event.isPaid ? '#ffa000' : '#4caf50',
                                 textTransform: 'uppercase'
                             }}>
-                                {event.status === 'Live' && <span style={{ marginRight: '6px' }}>●</span>}
-                                {event.status}
+                                {event.isPaid ? `PAID: ₹${event.fee}` : 'FREE'}
                             </div>
                             <div style={{
                                 position: 'absolute',
@@ -179,25 +148,110 @@ const StudentEvents = () => {
                                 </div>
                             </div>
 
-                            <button style={{
-                                marginTop: '1.5rem',
-                                width: '100%',
-                                padding: '12px',
-                                backgroundColor: event.status === 'Past' ? '#1a1a1a' : '#fff',
-                                color: event.status === 'Past' ? '#666' : '#000',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: 'bold',
-                                fontSize: '0.85rem',
-                                cursor: event.status === 'Past' ? 'default' : 'pointer',
-                                opacity: event.status === 'Past' ? 0.7 : 1
-                            }}>
-                                {event.status === 'Live' ? 'Join Now' : event.status === 'Past' ? 'Event Ended' : 'Register Now'}
+                            <button
+                                onClick={() => handleRegisterClick(event)}
+                                style={{
+                                    marginTop: '1.5rem',
+                                    width: '100%',
+                                    padding: '12px',
+                                    backgroundColor: '#fff',
+                                    color: '#000',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: 'bold',
+                                    fontSize: '0.85rem',
+                                    cursor: 'pointer',
+                                    opacity: 1
+                                }}
+                            >
+                                Register Now
                             </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Payment Modal */}
+            {showPaymentModal && selectedEvent && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: '#111',
+                        border: '1px solid #333',
+                        borderRadius: '16px',
+                        padding: '2rem',
+                        width: '400px',
+                        maxWidth: '90%',
+                        position: 'relative'
+                    }}>
+                        <button
+                            onClick={() => setShowPaymentModal(false)}
+                            style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#fff' }}>Confirm Registration</h3>
+                        <p style={{ color: '#888', marginBottom: '1.5rem' }}>
+                            You are registering for <span style={{ color: '#fff' }}>{selectedEvent.title}</span>.
+                        </p>
+
+                        <div style={{ backgroundColor: '#1a1a1a', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem', textAlign: 'center' }}>
+                            <p style={{ color: '#888', fontSize: '0.8rem', marginBottom: '8px' }}>Registration Fee</p>
+                            <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ffa000', marginBottom: '1rem' }}>₹{selectedEvent.fee}</h2>
+
+                            {selectedEvent.paymentQr && (
+                                <div style={{ margin: '1rem auto', width: '200px', height: '200px', backgroundColor: '#fff', padding: '10px', borderRadius: '8px' }}>
+                                    <img src={selectedEvent.paymentQr} alt="Payment QR" style={{ width: '100%', height: '100%' }} />
+                                </div>
+                            )}
+
+                            {selectedEvent.upiId && (
+                                <div style={{ marginTop: '1rem', padding: '8px', backgroundColor: '#333', borderRadius: '6px' }}>
+                                    <p style={{ fontSize: '0.8rem', color: '#ccc' }}>UPI ID: <span style={{ color: '#fff', fontWeight: 'bold' }}>{selectedEvent.upiId}</span></p>
+                                </div>
+                            )}
+
+                            <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '1rem' }}>
+                                Scan the QR code or use the UPI ID to complete the payment.
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={() => handleRegistration(selectedEvent.id)}
+                            disabled={registering}
+                            style={{
+                                width: '100%',
+                                padding: '14px',
+                                backgroundColor: '#d32f2f',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '10px',
+                                fontWeight: 'bold',
+                                fontSize: '1rem',
+                                cursor: registering ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                opacity: registering ? 0.7 : 1
+                            }}
+                        >
+                            {registering ? 'Processing...' : 'I Have Paid & Register'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };

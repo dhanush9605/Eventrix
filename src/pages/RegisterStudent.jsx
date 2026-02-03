@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, GraduationCap, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const RegisterStudent = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
+    // Redirect if already logged in
+    React.useEffect(() => {
+        if (user) {
+            const dashboardPath = user.role === 'admin' ? '/admin/overview' :
+                user.role === 'faculty' ? '/faculty/analytics' :
+                    '/student/dashboard';
+            navigate(dashboardPath, { replace: true });
+        }
+    }, [user, navigate]);
 
     return (
         <div style={{
@@ -70,16 +83,86 @@ const RegisterStudent = () => {
             <div style={{
                 backgroundColor: '#fff',
                 width: '100%',
-                maxWidth: '440px',
-                borderRadius: '12px',
-                padding: '3rem 2.5rem',
+                maxWidth: '460px',
+                borderRadius: '16px',
+                padding: '2.5rem 2.5rem',
                 textAlign: 'center',
                 color: '#333',
                 zIndex: 1,
                 boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
             }}>
+                <div style={{
+                    width: '60px',
+                    height: '60px',
+                    backgroundColor: '#d32f2f15',
+                    color: '#d32f2f',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1.5rem'
+                }}>
+                    <GraduationCap size={32} />
+                </div>
+
                 <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Join EventriX</h2>
-                <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '2rem' }}>Create your student account to manage college events</p>
+                <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '2rem' }}>Create your student account</p>
+
+                {/* Role Tabs */}
+                <div style={{
+                    display: 'flex',
+                    backgroundColor: '#f5f5f5',
+                    padding: '4px',
+                    borderRadius: '8px',
+                    marginBottom: '2rem',
+                    gap: '4px'
+                }}>
+                    <button
+                        onClick={() => navigate('/register/student')}
+                        style={{
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            padding: '10px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            backgroundColor: '#fff',
+                            color: '#d32f2f',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <GraduationCap size={16} />
+                        Student
+                    </button>
+                    <button
+                        onClick={() => navigate('/register/faculty')}
+                        style={{
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            padding: '10px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            backgroundColor: 'transparent',
+                            color: '#666',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <User size={16} />
+                        Faculty
+                    </button>
+                </div>
 
                 <form style={{ textAlign: 'left' }}>
                     <div style={{ marginBottom: '1.25rem' }}>

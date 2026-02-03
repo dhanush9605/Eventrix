@@ -1,33 +1,51 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, GraduationCap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, GraduationCap, User, ShieldCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-    const { login } = useAuth();
+    const { login, user } = useAuth();
+    const [activeRole, setActiveRole] = useState('student'); // 'student', 'faculty', 'admin'
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // Redirect if already logged in
+    React.useEffect(() => {
+        if (user) {
+            const dashboardPath = user.role === 'admin' ? '/admin/overview' :
+                user.role === 'faculty' ? '/faculty/analytics' :
+                    '/student/dashboard';
+            navigate(dashboardPath, { replace: true });
+        }
+    }, [user, navigate]);
+
     const handleLogin = (e) => {
         e.preventDefault();
         setError('');
 
-        if (email === 'student@eventrix.com' && password === 'student123') {
+        // Logic based on active role
+        if (activeRole === 'student' && email === 'student@eventrix.com' && password === 'student123') {
             login({ email, role: 'student', name: 'John Student' });
             navigate('/student/dashboard');
-        } else if (email === 'faculty@eventrix.com' && password === 'faculty123') {
+        } else if (activeRole === 'faculty' && email === 'faculty@eventrix.com' && password === 'faculty123') {
             login({ email, role: 'faculty', name: 'Dr. Faculty' });
             navigate('/faculty/analytics');
-        } else if (email === 'admin@eventrix.com' && password === 'admin123') {
+        } else if (activeRole === 'admin' && email === 'admin@eventrix.com' && password === 'admin123') {
             login({ email, role: 'admin', name: 'System Admin' });
-            navigate('/admin/users');
+            navigate('/admin/overview');
         } else {
-            setError('Invalid email or password. Please try again.');
+            setError(`Invalid ${activeRole} credentials. Please try again.`);
         }
     };
+
+    const roles = [
+        { id: 'student', label: 'Student', icon: <GraduationCap size={18} />, color: '#d32f2f' },
+        { id: 'faculty', label: 'Faculty', icon: <User size={18} />, color: '#1976d2' },
+        { id: 'admin', label: 'Admin', icon: <ShieldCheck size={18} />, color: '#455a64' }
+    ];
 
     return (
         <div style={{
@@ -74,28 +92,72 @@ const Login = () => {
             <div style={{
                 backgroundColor: '#fff',
                 width: '100%',
-                maxWidth: '400px',
-                borderRadius: '12px',
-                padding: '3rem 2rem',
+                maxWidth: '420px',
+                borderRadius: '16px',
+                padding: '2.5rem 2rem',
                 textAlign: 'center',
-                color: '#333'
+                color: '#333',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
             }}>
                 <div style={{
                     width: '60px',
                     height: '60px',
-                    backgroundColor: '#fff5f5',
-                    color: '#d32f2f',
+                    backgroundColor: `${roles.find(r => r.id === activeRole).color}15`,
+                    color: roles.find(r => r.id === activeRole).color,
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 1.5rem'
+                    margin: '0 auto 1.5rem',
+                    transition: 'all 0.3s ease'
                 }}>
-                    <GraduationCap size={32} />
+                    {roles.find(r => r.id === activeRole).icon}
                 </div>
 
-                <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Welcome Back</h2>
-                <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '2rem' }}>Smart College Event Management</p>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Login</h2>
+                <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '2rem' }}>Access your Eventrix account</p>
+
+                {/* Role Tabs */}
+                <div style={{
+                    display: 'flex',
+                    backgroundColor: '#f5f5f5',
+                    padding: '4px',
+                    borderRadius: '8px',
+                    marginBottom: '2rem',
+                    gap: '4px'
+                }}>
+                    {roles.map((role) => (
+                        <button
+                            key={role.id}
+                            onClick={() => {
+                                setActiveRole(role.id);
+                                setError('');
+                            }}
+                            style={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                padding: '10px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                backgroundColor: activeRole === role.id ? '#fff' : 'transparent',
+                                color: activeRole === role.id ? role.color : '#666',
+                                boxShadow: activeRole === role.id ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            {role.id === 'student' ? <GraduationCap size={16} /> :
+                                role.id === 'faculty' ? <User size={16} /> :
+                                    <ShieldCheck size={16} />}
+                            {role.label}
+                        </button>
+                    ))}
+                </div>
 
                 {error && (
                     <div style={{
@@ -114,12 +176,14 @@ const Login = () => {
 
                 <form style={{ textAlign: 'left' }} onSubmit={handleLogin}>
                     <div style={{ marginBottom: '1.25rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444' }}>Email Address</label>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444' }}>
+                            {activeRole === 'admin' ? 'Admin Username' : activeRole === 'faculty' ? 'Faculty Email' : 'Student Email'}
+                        </label>
                         <div style={{ position: 'relative' }}>
                             <Mail style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={18} />
                             <input
                                 type="email"
-                                placeholder="student@eventrix.com"
+                                placeholder={activeRole === 'student' ? "student@eventrix.com" : activeRole === 'faculty' ? "faculty@eventrix.com" : "admin@eventrix.com"}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 style={{
@@ -165,14 +229,27 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.85rem', marginBottom: '1.5rem', borderRadius: '6px' }}>
-                        Login
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        style={{
+                            width: '100%',
+                            padding: '0.85rem',
+                            marginBottom: '1.5rem',
+                            borderRadius: '6px',
+                            backgroundColor: roles.find(r => r.id === activeRole).color,
+                            border: 'none'
+                        }}
+                    >
+                        Login as {roles.find(r => r.id === activeRole).label}
                     </button>
                 </form>
 
-                <p style={{ fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                    Don't have an account? <Link to="/register/student" style={{ color: '#000', fontWeight: 'bold', textDecoration: 'none' }}>Register Now</Link>
-                </p>
+                {activeRole !== 'admin' && (
+                    <p style={{ fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+                        Don't have an account? <Link to={`/register/${activeRole}`} style={{ color: roles.find(r => r.id === activeRole).color, fontWeight: 'bold', textDecoration: 'none' }}>Register as {roles.find(r => r.id === activeRole).label}</Link>
+                    </p>
+                )}
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', color: '#ddd' }}>
                     <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
@@ -180,42 +257,24 @@ const Login = () => {
                     <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        padding: '0.75rem',
-                        border: '1px solid #eee',
-                        borderRadius: '6px',
-                        backgroundColor: '#fff',
-                        cursor: 'pointer',
-                        fontSize: '0.85rem',
-                        fontWeight: '600'
-                    }}>
-                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width="16" />
-                        Google
-                    </button>
-                    <button style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        padding: '0.75rem',
-                        border: '1px solid #eee',
-                        borderRadius: '6px',
-                        backgroundColor: '#fff',
-                        cursor: 'pointer',
-                        fontSize: '0.85rem',
-                        fontWeight: '600'
-                    }}>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png" alt="Outlook" width="16" />
-                        Outlook
-                    </button>
-                </div>
+                <button style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                    padding: '0.85rem',
+                    border: '1px solid #eee',
+                    borderRadius: '6px',
+                    backgroundColor: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    marginBottom: '1rem'
+                }}>
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width="18" />
+                    Continue with Google
+                </button>
             </div>
 
             <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#666', maxWidth: '400px', textAlign: 'center' }}>

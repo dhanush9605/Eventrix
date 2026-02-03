@@ -16,9 +16,18 @@ export const EventProvider = ({ children }) => {
         return savedEvents ? JSON.parse(savedEvents) : [];
     });
 
+    const [registrations, setRegistrations] = useState(() => {
+        const savedRegs = localStorage.getItem('eventrix_registrations');
+        return savedRegs ? JSON.parse(savedRegs) : [];
+    });
+
     useEffect(() => {
         localStorage.setItem('eventrix_events', JSON.stringify(events));
     }, [events]);
+
+    useEffect(() => {
+        localStorage.setItem('eventrix_registrations', JSON.stringify(registrations));
+    }, [registrations]);
 
     const addEvent = (eventData) => {
         const newEvent = {
@@ -47,13 +56,59 @@ export const EventProvider = ({ children }) => {
         return events.find(event => event.id === id);
     };
 
+    const registerForEvent = (eventId, studentDetails) => {
+        if (!studentDetails || !studentDetails.id) return { success: false, message: 'User not logged in' };
+
+        // Real-time check against local storage to prevent race conditions from rapid clicks
+        const currentRegs = JSON.parse(localStorage.getItem('eventrix_registrations') || '[]');
+        const isDuplicate = currentRegs.some(r => r.eventId === eventId && r.studentId === studentDetails.id);
+
+        if (isDuplicate) {
+            return { success: false, message: 'You are already registered for this event.' };
+        }
+
+        const newRegistration = {
+            id: 'REG-' + Date.now(),
+            eventId,
+            studentId: studentDetails.id,
+            studentName: studentDetails.name,
+            timestamp: new Date().toISOString(),
+            status: 'Confirmed'
+        };
+
+        // Update state and localStorage immediately
+        const updatedRegs = [...currentRegs, newRegistration];
+        setRegistrations(updatedRegs);
+        localStorage.setItem('eventrix_registrations', JSON.stringify(updatedRegs));
+
+        // Update event registration count
+        setEvents(prev => prev.map(event => {
+            if (event.id === eventId) {
+                return { ...event, registrations: (event.registrations || 0) + 1 };
+            }
+            return event;
+        }));
+
+        return { success: true };
+    };
+
+    const getStudentRegistrations = (studentId) => {
+        return registrations.filter(r => r.studentId === studentId).map(reg => {
+            const event = events.find(e => e.id === reg.eventId);
+            return { ...reg, eventDetails: event };
+        });
+    };
+
     return (
         <EventContext.Provider value={{
             events,
+            registrations,
             addEvent,
             updateEvent,
             deleteEvent,
-            getEventById
+            getEventById,
+            registerForEvent,
+            getStudentRegistrations
         }}>
             {children}
         </EventContext.Provider>

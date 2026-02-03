@@ -1,64 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useEvents } from '../../context/EventContext';
+import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { Calendar, Award, MoreVertical, PlayCircle } from 'lucide-react';
 
 const StudentDashboard = () => {
-    const [loading, setLoading] = React.useState(true);
-    const [dashboardData, setDashboardData] = React.useState({
+    const { events, getStudentRegistrations } = useEvents();
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
+
+    const [dashboardData, setDashboardData] = useState({
         metrics: [],
         liveEvents: [],
         upcoming: []
     });
 
-    React.useEffect(() => {
-        // Simulate API fetch
-        const fetchDashboardData = async () => {
-            try {
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+    useEffect(() => {
+        // Compute stats from real data
+        const registrations = getStudentRegistrations(user?.id);
+        const liveEvents = events.filter(e => e.status === 'active').slice(0, 3);
+        const upcoming = registrations.slice(0, 5);
 
-                setDashboardData({
-                    metrics: [
-                        { label: 'Registered Events', value: '12', subtext: '+2 since last month', icon: Calendar, color: '#d32f2f' },
-                        { label: 'Attended Events', value: '08', subtext: 'Attendance Rate: 66%', icon: PlayCircle, color: '#fff' },
-                        { label: 'Certificates', value: '05', subtext: '3 pending validation', icon: Award, color: '#fff' }
-                    ],
-                    liveEvents: [
-                        {
-                            id: 1,
-                            title: 'AI Workshop 2024',
-                            location: 'Main Auditorium',
-                            status: 'Ending in 45m',
-                            image: 'https://images.unsplash.com/photo-1591453089816-0fbb971b454c?q=80&w=400&auto=format&fit=crop'
-                        },
-                        {
-                            id: 2,
-                            title: 'Annual Tech Symposium',
-                            location: 'Virtual Hall A • Room: Q4-A',
-                            status: 'Live Now',
-                            image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400&auto=format&fit=crop'
-                        },
-                        {
-                            id: 3,
-                            title: 'Hackathon Finals',
-                            location: 'Innovation Lab • Presentations Start',
-                            status: 'Live Now',
-                            image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=400&auto=format&fit=crop'
-                        }
-                    ],
-                    upcoming: [
-                        { title: 'Web3 Fundamentals Seminar', date: 'Oct 24, 2024 • 10:00 AM', pass: 'Standard Pass', id: '#TX-92834' },
-                        { title: 'Design Thinking Workshop', date: 'Oct 26, 2024 • 02:00 PM', pass: 'Premium Pass', id: '#TX-92835' }
-                    ]
-                });
-                setLoading(false);
-            } catch (error) {
-                console.error("Failed to load dashboard data", error);
-                setLoading(false);
-            }
-        };
-
-        fetchDashboardData();
-    }, []);
+        setDashboardData({
+            metrics: [
+                { label: 'Registered Events', value: registrations.length.toString(), subtext: 'Total registrations', icon: Calendar, color: '#d32f2f' },
+                { label: 'Attended Events', value: '0', subtext: 'Attendance Rate: 0%', icon: PlayCircle, color: '#fff' }, // Placeholder
+                { label: 'Certificates', value: '0', subtext: '0 pending validation', icon: Award, color: '#fff' } // Placeholder
+            ],
+            liveEvents: liveEvents,
+            upcoming: upcoming
+        });
+        setLoading(false);
+    }, [events, user]);
 
     const handleJoinSession = (eventName) => {
         alert(`Joining session for: ${eventName}`);
@@ -119,9 +92,14 @@ const StudentDashboard = () => {
                     {liveEvents.map((e, i) => (
                         <div key={i} style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
                             <div style={{ position: 'relative', height: '180px' }}>
-                                <img src={e.image} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                                {e.bannerImage ? (
+                                    <img src={e.bannerImage} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', backgroundColor: '#222' }} />
+                                )}
+
                                 <div style={{ position: 'absolute', top: '12px', left: '12px', backgroundColor: 'rgba(0,0,0,0.6)', padding: '4px 10px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #333' }}>
-                                    <span style={{ color: '#d32f2f', marginRight: '6px' }}>●</span> LIVE NOW
+                                    <span style={{ color: '#d32f2f', marginRight: '6px' }}>●</span> {e.status.toUpperCase()}
                                 </div>
                             </div>
                             <div style={{ padding: '1.5rem' }}>
@@ -144,7 +122,7 @@ const StudentDashboard = () => {
                                     onMouseEnter={(e) => e.target.style.backgroundColor = '#111'}
                                     onMouseLeave={(e) => e.target.style.backgroundColor = '#0a0a0a'}
                                 >
-                                    Join Session
+                                    {e.status === 'active' ? 'Register Now' : 'View Details'}
                                 </button>
                             </div>
                         </div>
@@ -169,14 +147,16 @@ const StudentDashboard = () => {
                                     <Calendar size={20} />
                                 </div>
                                 <div>
-                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '4px' }}>{u.title}</h4>
-                                    <p style={{ fontSize: '0.75rem', color: '#666' }}>{u.date}</p>
+                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '4px' }}>{u.eventDetails?.title || 'Unknown Event'}</h4>
+                                    <p style={{ fontSize: '0.75rem', color: '#666' }}>{u.eventDetails?.date || 'Date N/A'}</p>
                                 </div>
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
                                 <div style={{ textAlign: 'right' }}>
-                                    <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#888' }}>{u.pass}</span>
+                                    <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#888' }}>
+                                        {u.eventDetails?.isPaid ? 'Paid Entry' : 'Standard Pass'}
+                                    </span>
                                     <span style={{ fontSize: '0.6rem', color: '#444' }}>{u.id}</span>
                                 </div>
                                 <MoreVertical size={20} color="#444" cursor="pointer" />
