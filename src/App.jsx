@@ -14,7 +14,14 @@ import Settings from './pages/Settings'; // Import
 import HelpCenter from './pages/HelpCenter'; // Import
 import FacultyAnalytics from './pages/faculty/Analytics';
 import FacultyApprovals from './pages/faculty/Approvals';
+import FacultyCreateEvent from './pages/faculty/CreateEvent';
+import FacultyManageEvents from './pages/faculty/ManageEvents';
 import AdminUsers from './pages/admin/Users';
+
+import AdminOverview from './pages/admin/Overview';
+import AdminDepartments from './pages/admin/Departments';
+import AdminEvents from './pages/admin/Events';
+import AdminReports from './pages/admin/Reports';
 
 function App() {
   return (
@@ -77,9 +84,46 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/faculty/create-event" element={
+            <ProtectedRoute allowedRoles={['faculty']}>
+              <FacultyCreateEvent />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/faculty/manage-events" element={
+            <ProtectedRoute allowedRoles={['faculty']}>
+              <FacultyManageEvents />
+            </ProtectedRoute>
+          } />
+
+          {/* Admin Routes */}
+          <Route path="/admin/overview" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminOverview />
+            </ProtectedRoute>
+          } />
+
           <Route path="/admin/users" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminUsers />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/departments" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDepartments />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/events" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminEvents />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/reports" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminReports />
             </ProtectedRoute>
           } />
 

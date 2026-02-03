@@ -1,7 +1,7 @@
 import React from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
-import { User, Bell, Lock, Save } from 'lucide-react';
+import { User, Bell, Lock, Save, Sliders } from 'lucide-react';
 
 const Settings = () => {
     const { user } = useAuth();
@@ -12,66 +12,68 @@ const Settings = () => {
         <DashboardLayout role={role} title="Account Settings">
             <div style={{ maxWidth: '800px' }}>
                 {/* Profile Section */}
-                <div style={{ marginBottom: '2rem', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div style={{ padding: '10px', backgroundColor: '#d32f2f15', borderRadius: '8px' }}>
-                            <User size={24} color="#d32f2f" />
+                {role !== 'admin' && (
+                    <div style={{ marginBottom: '2rem', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{ padding: '10px', backgroundColor: '#d32f2f15', borderRadius: '8px' }}>
+                                <User size={24} color="#d32f2f" />
+                            </div>
+                            <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Profile Information</h2>
                         </div>
-                        <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Profile Information</h2>
-                    </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>Full Name</label>
-                            <input
-                                type="text"
-                                defaultValue={user?.name || (role === 'student' ? 'Alex Johnson' : 'Dr. Aris Thorne')}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: '#111',
-                                    border: '1px solid #222',
-                                    borderRadius: '8px',
-                                    padding: '12px',
-                                    color: '#fff',
-                                    fontSize: '0.9rem'
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>Email Address</label>
-                            <input
-                                type="email"
-                                defaultValue={user?.email || (role === 'student' ? 'alex.j@university.edu' : 'aris.thorne@university.edu')}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: '#111',
-                                    border: '1px solid #222',
-                                    borderRadius: '8px',
-                                    padding: '12px',
-                                    color: '#fff',
-                                    fontSize: '0.9rem'
-                                }}
-                            />
-                        </div>
-                        <div style={{ gridColumn: 'span 2' }}>
-                            <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>Bio</label>
-                            <textarea
-                                rows="3"
-                                placeholder="Tell us a little about yourself..."
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: '#111',
-                                    border: '1px solid #222',
-                                    borderRadius: '8px',
-                                    padding: '12px',
-                                    color: '#fff',
-                                    fontSize: '0.9rem',
-                                    resize: 'none'
-                                }}
-                            ></textarea>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>Full Name</label>
+                                <input
+                                    type="text"
+                                    defaultValue={user?.name || (role === 'student' ? 'Alex Johnson' : 'Dr. Aris Thorne')}
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: '#111',
+                                        border: '1px solid #222',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        color: '#fff',
+                                        fontSize: '0.9rem'
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>Email Address</label>
+                                <input
+                                    type="email"
+                                    defaultValue={user?.email || (role === 'student' ? 'alex.j@university.edu' : 'aris.thorne@university.edu')}
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: '#111',
+                                        border: '1px solid #222',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        color: '#fff',
+                                        fontSize: '0.9rem'
+                                    }}
+                                />
+                            </div>
+                            <div style={{ gridColumn: 'span 2' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>Bio</label>
+                                <textarea
+                                    rows="3"
+                                    placeholder="Tell us a little about yourself..."
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: '#111',
+                                        border: '1px solid #222',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        color: '#fff',
+                                        fontSize: '0.9rem',
+                                        resize: 'none'
+                                    }}
+                                ></textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Notifications Section */}
                 <div style={{ marginBottom: '2rem', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '2rem' }}>
@@ -114,7 +116,54 @@ const Settings = () => {
                     </div>
                 </div>
 
-                {/* Password Section */}
+                {/* System Configuration Section (Admin Only) */}
+                {role === 'admin' && (
+                    <div style={{ marginBottom: '2rem', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{ padding: '10px', backgroundColor: '#d32f2f15', borderRadius: '8px' }}>
+                                <Sliders size={24} color="#d32f2f" />
+                            </div>
+                            <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>System Configuration</h2>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {[
+                                { label: 'Maintenance Mode', desc: 'Prevent users from accessing the platform during updates', active: false },
+                                { label: 'Student Registration', desc: 'Allow new students to register accounts', active: true },
+                                { label: 'Faculty Registration', desc: 'Allow new faculty members to register accounts', active: true },
+                                { label: 'Public Leaderboards', desc: 'Show event rankings to all authenticated users', active: true }
+                            ].map((item, i, arr) => (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i !== arr.length - 1 ? '1px solid #1a1a1a' : 'none' }}>
+                                    <div>
+                                        <span style={{ color: '#ccc', fontSize: '0.95rem', display: 'block', fontWeight: '500' }}>{item.label}</span>
+                                        <span style={{ color: '#666', fontSize: '0.75rem' }}>{item.desc}</span>
+                                    </div>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '20px',
+                                        backgroundColor: item.active ? '#d32f2f' : '#333',
+                                        borderRadius: '100px',
+                                        position: 'relative',
+                                        cursor: 'pointer'
+                                    }}>
+                                        <div style={{
+                                            width: '16px',
+                                            height: '16px',
+                                            backgroundColor: '#fff',
+                                            borderRadius: '50%',
+                                            position: 'absolute',
+                                            top: '2px',
+                                            left: item.active ? '22px' : '2px',
+                                            transition: 'left 0.2s'
+                                        }}></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Security Section */}
                 <div style={{ marginBottom: '3rem', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                         <div style={{ padding: '10px', backgroundColor: '#d32f2f15', borderRadius: '8px' }}>

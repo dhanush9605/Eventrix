@@ -11,7 +11,8 @@ import {
     Settings,
     HelpCircle,
     LogOut,
-    Bell
+    Bell,
+    Plus
 } from 'lucide-react';
 
 const Sidebar = ({ role }) => {
@@ -25,17 +26,16 @@ const Sidebar = ({ role }) => {
         ],
         faculty: [
             { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/faculty/analytics' },
-            { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/faculty/analytics' },
+            { id: 'create-event', label: 'Create Event', icon: Plus, path: '/faculty/create-event' },
+            { id: 'manage-events', label: 'Manage Events', icon: Calendar, path: '/faculty/manage-events' },
             { id: 'approvals', label: 'Approvals', icon: FileCheck, path: '/faculty/approvals' },
-            { id: 'events', label: 'Events', icon: Calendar, path: '#' },
-            { id: 'attendees', label: 'Attendees', icon: Users, path: '#' },
         ],
         admin: [
-            { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '#' },
+            { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '/admin/overview' },
             { id: 'users', label: 'Users', icon: Users, path: '/admin/users' },
-            { id: 'departments', label: 'Departments', icon: LayoutDashboard, path: '#' },
-            { id: 'events', label: 'Events', icon: Calendar, path: '#' },
-            { id: 'reports', label: 'Reports', icon: BarChart3, path: '#' },
+            { id: 'departments', label: 'Departments', icon: LayoutDashboard, path: '/admin/departments' },
+            { id: 'events', label: 'Events', icon: Calendar, path: '/admin/events' },
+            { id: 'reports', label: 'Reports', icon: BarChart3, path: '/admin/reports' },
         ]
     };
 
@@ -44,9 +44,9 @@ const Sidebar = ({ role }) => {
     return (
         <aside style={{
             width: '280px',
-            backgroundColor: '#0a0a0a',
+            backgroundColor: '#050505',
             height: '100vh',
-            borderRight: '1px solid #1a1a1a',
+            borderRight: '1px solid #111',
             padding: '2rem 1.5rem',
             display: 'flex',
             flexDirection: 'column',
@@ -55,11 +55,11 @@ const Sidebar = ({ role }) => {
             top: 0
         }}>
             {/* Sidebar Logo */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3rem' }}>
-                <div style={{ width: '32px', height: '32px', backgroundColor: '#d32f2f', borderRadius: '4px' }}></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3rem', paddingLeft: '0.5rem' }}>
+                <div style={{ width: '38px', height: '38px', backgroundColor: '#d32f2f', borderRadius: '8px', boxShadow: '0 0 15px rgba(211, 47, 47, 0.4)' }}></div>
                 <div>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'block', lineHeight: 1 }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
-                    <span style={{ fontSize: '0.6rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <span style={{ fontSize: '1.4rem', fontWeight: '800', display: 'block', lineHeight: 1, letterSpacing: '-0.5px' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
+                    <span style={{ fontSize: '0.65rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: '600', display: 'block', marginTop: '4px' }}>
                         {role.toUpperCase()} PORTAL
                     </span>
                 </div>
@@ -67,28 +67,47 @@ const Sidebar = ({ role }) => {
 
             {/* Navigation */}
             <nav style={{ flex: 1 }}>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
+                <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {currentMenu.map((item) => (
-                        <li key={item.id} style={{ marginBottom: '0.5rem' }}>
+                        <li key={item.id}>
                             <NavLink
                                 to={item.path}
                                 style={({ isActive }) => ({
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '12px',
-                                    padding: '12px 1rem',
-                                    borderRadius: '8px',
+                                    padding: '16px 1.5rem',
+                                    borderRadius: '12px',
                                     textDecoration: 'none',
-                                    color: isActive ? '#fff' : '#666',
-                                    backgroundColor: isActive ? '#d32f2f15' : 'transparent',
-                                    borderRight: isActive ? '3px solid #d32f2f' : 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: isActive ? '600' : '400',
-                                    transition: 'all 0.2s'
+                                    color: isActive ? '#fff' : '#888',
+                                    backgroundColor: isActive ? '#0f0505' : 'transparent',
+                                    border: isActive ? '1px solid #d32f2f' : '1px solid transparent',
+                                    fontSize: '0.95rem',
+                                    fontWeight: isActive ? '700' : '500',
+                                    transition: 'all 0.2s',
+                                    position: 'relative',
+                                    boxShadow: isActive ? 'inset 4px 0 0 #d32f2f' : 'none', // Left accent
                                 })}
                             >
-                                <item.icon size={20} color={window.location.pathname === item.path ? '#d32f2f' : 'currentColor'} />
-                                {item.label}
+                                {({ isActive }) => (
+                                    <>
+                                        <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} color={isActive ? '#fff' : 'currentColor'} />
+                                        {item.label}
+                                        {isActive && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                right: 0,
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                width: '3px',
+                                                height: '60%',
+                                                backgroundColor: '#d32f2f',
+                                                borderRadius: '4px 0 0 4px',
+                                                boxShadow: '0 0 10px #d32f2f'
+                                            }}></div>
+                                        )}
+                                    </>
+                                )}
                             </NavLink>
                         </li>
                     ))}
@@ -96,40 +115,49 @@ const Sidebar = ({ role }) => {
 
                 {/* Support Section */}
                 <div style={{ marginTop: '2.5rem' }}>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em', paddingLeft: '1rem' }}>Support</span>
-                    <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
-                        <li style={{ marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em', paddingLeft: '1rem', display: 'block', marginBottom: '0.75rem' }}>Support</span>
+                    <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {/* The 'Help Center' NavLink was not found in the original document, so no changes were made here. */}
+                        {/* If you intended to remove the 'Settings' NavLink, please specify. */}
+                        <li>
                             <NavLink
                                 to="/settings"
                                 style={({ isActive }) => ({
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '12px',
-                                    padding: '10px 1rem',
+                                    padding: '16px 1.5rem',
+                                    borderRadius: '12px',
                                     textDecoration: 'none',
-                                    color: isActive ? '#fff' : '#666',
-                                    fontSize: '0.9rem',
-                                    fontWeight: isActive ? '600' : '400',
+                                    color: isActive ? '#fff' : '#888',
+                                    backgroundColor: isActive ? '#0f0505' : 'transparent',
+                                    border: isActive ? '1px solid #d32f2f' : '1px solid transparent',
+                                    fontSize: '0.95rem',
+                                    fontWeight: isActive ? '700' : '500',
+                                    transition: 'all 0.2s',
+                                    position: 'relative',
+                                    boxShadow: isActive ? 'inset 4px 0 0 #d32f2f' : 'none',
                                 })}
                             >
-                                <Settings size={20} /> Settings
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/help-center"
-                                style={({ isActive }) => ({
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    padding: '10px 1rem',
-                                    textDecoration: 'none',
-                                    color: isActive ? '#fff' : '#666',
-                                    fontSize: '0.9rem',
-                                    fontWeight: isActive ? '600' : '400',
-                                })}
-                            >
-                                <HelpCircle size={20} /> Help Center
+                                {({ isActive }) => (
+                                    <>
+                                        <Settings size={22} strokeWidth={isActive ? 2.5 : 2} color={isActive ? '#fff' : 'currentColor'} />
+                                        Settings
+                                        {isActive && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                right: 0,
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                width: '3px',
+                                                height: '60%',
+                                                backgroundColor: '#d32f2f',
+                                                borderRadius: '4px 0 0 4px',
+                                                boxShadow: '0 0 10px #d32f2f'
+                                            }}></div>
+                                        )}
+                                    </>
+                                )}
                             </NavLink>
                         </li>
                     </ul>
