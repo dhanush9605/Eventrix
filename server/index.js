@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import eventRoutes from './routes/events.js';
+import seedAdmin from './createAdmin.js';
 
 dotenv.config();
 
@@ -16,7 +17,10 @@ app.use(cors());
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventrix')
-    .then(() => console.log('Connected to MongoDB'))
+    .then(() => {
+        console.log('Connected to MongoDB');
+        seedAdmin();
+    })
     .catch((err) => console.error('MongoDB connection error:', err));
 
 // Routes

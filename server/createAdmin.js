@@ -3,13 +3,8 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import User from './models/User.js';
 
-dotenv.config();
-
-const createAdmin = async () => {
+const seedAdmin = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('Connected to MongoDB');
-
         const email = 'admin@eventrix.com';
         const password = 'admin123';
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -17,12 +12,7 @@ const createAdmin = async () => {
         let admin = await User.findOne({ email });
 
         if (admin) {
-            console.log('Admin user already exists.');
-            console.log(`Email: ${email}`);
-            // If you want to update the password, uncomment the next lines
-            // admin.password = hashedPassword;
-            // await admin.save();
-            // console.log('Password updated to default.');
+            console.log('Admin user check: User already exists.');
         } else {
             admin = await User.create({
                 name: 'System Admin',
@@ -35,12 +25,9 @@ const createAdmin = async () => {
             console.log(`Email: ${email}`);
             console.log(`Password: ${password}`);
         }
-
-        process.exit();
     } catch (error) {
-        console.error('Error creating admin:', error);
-        process.exit(1);
+        console.error('Error seeding admin:', error);
     }
 };
 
-createAdmin();
+export default seedAdmin;
