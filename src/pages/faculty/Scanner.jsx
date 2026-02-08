@@ -13,6 +13,18 @@ const FacultyScanner = () => {
     useEffect(() => {
         let scanner = null;
 
+        function onScanSuccess(decodedText) {
+            // decodedText should be the studentId
+            const result = markAttendance(selectedEvent._id, decodedText);
+            setScanResult(result);
+            setIsScanning(false); // Stop scanning after success/error to show result
+        }
+
+        function onScanFailure() {
+            // We usually don't want to show every failure (e.g. "no QR code found in frame")
+            // but we could log it or show a subtle indicator
+        }
+
         if (isScanning && selectedEvent) {
             scanner = new Html5QrcodeScanner(
                 "reader",
@@ -30,19 +42,7 @@ const FacultyScanner = () => {
                 });
             }
         };
-    }, [isScanning, selectedEvent]);
-
-    function onScanSuccess(decodedText, decodedResult) {
-        // decodedText should be the studentId
-        const result = markAttendance(selectedEvent._id, decodedText);
-        setScanResult(result);
-        setIsScanning(false); // Stop scanning after success/error to show result
-    }
-
-    function onScanFailure(error) {
-        // We usually don't want to show every failure (e.g. "no QR code found in frame")
-        // but we could log it or show a subtle indicator
-    }
+    }, [isScanning, selectedEvent, markAttendance]);
 
     const resetScanner = () => {
         setScanResult(null);

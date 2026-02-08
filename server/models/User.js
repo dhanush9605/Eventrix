@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema({
         enum: ['student', 'faculty', 'admin'],
         default: 'student'
     },
+    status: {
+        type: String,
+        enum: ['Active', 'Blocked', 'Pending'],
+        default: 'Active'
+    },
     department: { type: String, required: true },
 
     // Specific Fields

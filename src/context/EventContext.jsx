@@ -4,6 +4,7 @@ import * as api from '../services/api';
 
 const EventContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useEvents = () => {
     const context = useContext(EventContext);
     if (!context) {
@@ -15,7 +16,7 @@ export const useEvents = () => {
 export const EventProvider = ({ children }) => {
     const { user } = useAuth();
     const [events, setEvents] = useState([]);
-    const [registrations, setRegistrations] = useState(() => {
+    const [registrations] = useState(() => {
         const savedRegs = localStorage.getItem('eventrix_registrations');
         return savedRegs ? JSON.parse(savedRegs) : [];
     });
@@ -45,15 +46,16 @@ export const EventProvider = ({ children }) => {
         localStorage.setItem('eventrix_registrations', JSON.stringify(registrations));
     }, [registrations]);
 
-    const addEvent = async (eventData) => {
+    const addEvent = React.useCallback(async (eventData) => {
         try {
             const { data } = await api.createEvent({ ...eventData, facultyId: user._id || user.id });
             setEvents(prev => [data, ...prev]);
             return { success: true };
         } catch (error) {
+            console.error(error);
             return { success: false, message: 'Failed to create event' };
         }
-    };
+    }, [user]);
 
     const updateEvent = (id, updatedData) => {
         setEvents(prev => prev.map(event =>
@@ -124,7 +126,7 @@ export const EventProvider = ({ children }) => {
         }
     };
 
-    const getStudentRegistrations = (studentId) => {
+    const getStudentRegistrations = React.useCallback((studentId) => {
         // Filter events where this student is registered
         return events.filter(event =>
             event.registrations?.some(reg => reg.studentId === studentId)
@@ -139,7 +141,7 @@ export const EventProvider = ({ children }) => {
                 eventDetails: event
             };
         });
-    };
+    }, [events]);
 
     return (
         <EventContext.Provider value={{

@@ -50,14 +50,7 @@ const StudentEvents = () => {
         }
     };
 
-    const getStatusColor = (status) => {
-        switch (status.toLowerCase()) {
-            case 'live': return '#d32f2f';
-            case 'upcoming': return '#2196f3';
-            case 'past': return '#666';
-            default: return '#666';
-        }
-    };
+
 
     return (
         <DashboardLayout role="student" title="Events Directory">

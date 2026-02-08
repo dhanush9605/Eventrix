@@ -1,145 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { Download, UserPlus, ChevronDown, ChevronLeft, ChevronRight, UserCheck, ShieldOff, Clock, Search, X } from 'lucide-react';
+import { getUsers, updateUserStatus, deleteUser } from '../../services/api';
 
 const AdminUserManagement = () => {
-    // Mock Data Generator
-    const generateInitialUsers = () => [
-        { id: 1, name: 'Alexander Bennett', email: 'a.bennett@college.edu', role: 'STUDENT', dept: 'Computer Science', status: 'Active' },
-        { id: 2, name: 'Dr. Sarah Jenkins', email: 's.jenkins@faculty.edu', role: 'FACULTY', dept: 'Applied Arts', status: 'Active' },
-        { id: 3, name: 'Michael Thompson', email: 'm.thompson@admin.edu', role: 'ADMIN', dept: 'Central Administration', status: 'Active' },
-        { id: 4, name: 'Jessica Williams', email: 'j.williams@college.edu', role: 'STUDENT', dept: 'Mechanical Engineering', status: 'Blocked' },
-        { id: 5, name: 'David Chen', email: 'd.chen@college.edu', role: 'STUDENT', dept: 'Physics', status: 'Active' },
-        { id: 6, name: 'Emily Davis', email: 'e.davis@faculty.edu', role: 'FACULTY', dept: 'Mathematics', status: 'Pending' },
-        { id: 7, name: 'Robert Wilson', email: 'r.wilson@admin.edu', role: 'ADMIN', dept: 'Finance', status: 'Active' },
-        { id: 8, name: 'Samantha Brown', email: 's.brown@college.edu', role: 'STUDENT', dept: 'Chemistry', status: 'Active' }
-    ];
-
-    const [users, setUsers] = useState(generateInitialUsers());
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState('All');
     const [statusFilter, setStatusFilter] = useState('All');
-    const [filteredUsers, setFilteredUsers] = useState(users);
 
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', role: 'STUDENT', dept: '', status: 'Active' });
+    // Stats
+    const [stats, setStats] = useState({ active: 0, blocked: 0, pending: 0 });
 
-    // Stats calculation
-    const activeCount = users.filter(u => u.status === 'Active').length;
-    const blockedCount = users.filter(u => u.status === 'Blocked').length;
-    const pendingCount = users.filter(u => u.status === 'Pending').length;
+    const fetchUsers = React.useCallback(async () => {
+        try {
+            setLoading(true);
+            const { data } = await getUsers({
+                search: searchTerm,
+                role: roleFilter,
+                status: statusFilter
+            });
+            setUsers(data);
 
-    const stats = [
-        { label: 'ACTIVE ACCOUNTS', value: activeCount, icon: UserCheck, color: '#00c853', bg: '#00c85310' },
-        { label: 'BLOCKED ACCOUNTS', value: blockedCount, icon: ShieldOff, color: '#d32f2f', bg: '#d32f2f10' },
-        { label: 'PENDING VERIFICATION', value: pendingCount, icon: Clock, color: '#2979ff', bg: '#2979ff10' }
-    ];
+            setStats({
+                active: data.filter(u => u.status === 'Active').length,
+                blocked: data.filter(u => u.status === 'Blocked').length,
+                pending: data.filter(u => u.status === 'Pending').length
+            });
 
-    // Filter Logic
+        } catch (error) {
+            console.error('Failed to fetch users', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [searchTerm, roleFilter, statusFilter]);
+
     useEffect(() => {
-        let result = users;
+        // Debounce search
+        const timer = setTimeout(() => {
+            fetchUsers();
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm, roleFilter, statusFilter, fetchUsers]);
 
-        if (searchTerm) {
-            const lowerTerm = searchTerm.toLowerCase();
-            result = result.filter(user =>
-                user.name.toLowerCase().includes(lowerTerm) ||
-                user.email.toLowerCase().includes(lowerTerm)
-            );
+    const handleBlockToggle = async (user) => {
+        if (!window.confirm(`Are you sure you want to ${user.status === 'Blocked' ? 'unblock' : 'block'} this user?`)) return;
+        try {
+            const newStatus = user.status === 'Blocked' ? 'Active' : 'Blocked';
+            await updateUserStatus(user._id, newStatus);
+            fetchUsers(); // Refresh
+        } catch (error) {
+            console.error('Failed to update status', error);
+            alert('Failed to update status');
         }
-
-        if (roleFilter !== 'All') {
-            result = result.filter(user => user.role === roleFilter.toUpperCase());
-        }
-
-        if (statusFilter !== 'All') {
-            result = result.filter(user => user.status === statusFilter);
-        }
-
-        setFilteredUsers(result);
-    }, [users, searchTerm, roleFilter, statusFilter]);
-
-    // Actions
-    const handleAddUser = (e) => {
-        e.preventDefault();
-        const id = users.length + 1;
-        setUsers([...users, { ...newUser, id }]);
-        setShowAddModal(false);
-        setNewUser({ name: '', email: '', role: 'STUDENT', dept: '', status: 'Active' });
     };
 
-    const handleBlockToggle = (id) => {
-        setUsers(users.map(user => {
-            if (user.id === id) {
-                return { ...user, status: user.status === 'Blocked' ? 'Active' : 'Blocked' };
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            try {
+                await deleteUser(id);
+                fetchUsers();
+            } catch (error) {
+                console.error('Failed to delete user', error);
+                alert('Failed to delete user');
             }
-            return user;
-        }));
-    };
-
-    const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to remove this user?')) {
-            setUsers(users.filter(user => user.id !== id));
         }
     };
+
+    const statCards = [
+        { label: 'ACTIVE ACCOUNTS', value: stats.active, icon: UserCheck, color: '#00c853', bg: '#00c85310' },
+        { label: 'BLOCKED ACCOUNTS', value: stats.blocked, icon: ShieldOff, color: '#d32f2f', bg: '#d32f2f10' },
+        { label: 'PENDING VERIFICATION', value: stats.pending, icon: Clock, color: '#2979ff', bg: '#2979ff10' }
+    ];
 
     return (
         <DashboardLayout role="admin" title="User Management">
-            {showAddModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '12px', width: '400px', maxWidth: '90%' }}>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#333' }}>Add New User</h3>
-                        <form onSubmit={handleAddUser}>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444' }}>Full Name</label>
-                                <input
-                                    type="text" required
-                                    value={newUser.name}
-                                    onChange={e => setNewUser({ ...newUser, name: e.target.value })}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444' }}>Email Address</label>
-                                <input
-                                    type="email" required
-                                    value={newUser.email}
-                                    onChange={e => setNewUser({ ...newUser, email: e.target.value })}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444' }}>Role</label>
-                                <select
-                                    value={newUser.role}
-                                    onChange={e => setNewUser({ ...newUser, role: e.target.value })}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                >
-                                    <option value="STUDENT">Student</option>
-                                    <option value="FACULTY">Faculty</option>
-                                    <option value="ADMIN">Admin</option>
-                                </select>
-                            </div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444' }}>Department</label>
-                                <input
-                                    type="text" required
-                                    value={newUser.dept}
-                                    onChange={e => setNewUser({ ...newUser, dept: e.target.value })}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button type="button" onClick={() => setShowAddModal(false)} style={{ flex: 1, padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
-                                <button type="submit" style={{ flex: 1, padding: '0.75rem', borderRadius: '6px', border: 'none', backgroundColor: '#d32f2f', color: '#fff', cursor: 'pointer', fontWeight: '600' }}>Add User</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             <div style={{ marginBottom: '3rem' }}>
                 <p style={{ color: '#666', fontSize: '0.9rem', maxWidth: '600px' }}>
@@ -149,13 +85,7 @@ const AdminUserManagement = () => {
                     <button style={{ backgroundColor: '#111', border: '1px solid #222', color: '#fff', padding: '10px 20px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                         <Download size={16} /> Export CSV
                     </button>
-                    <button
-                        onClick={() => setShowAddModal(true)}
-                        className="btn btn-primary"
-                        style={{ padding: '10px 20px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', border: 'none' }}
-                    >
-                        <UserPlus size={16} /> Add New User
-                    </button>
+                    {/* Add User Modal Logic can be re-added here if needed later, currently focusing on listing/managing existing */}
                 </div>
             </div>
 
@@ -225,7 +155,7 @@ const AdminUserManagement = () => {
                 </select>
             </div>
 
-            {/* User Table Header */}
+            {/* User Table */}
             <div style={{ backgroundColor: '#fff', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead style={{ backgroundColor: '#fff', borderBottom: '1px solid #f0f0f0' }}>
@@ -238,17 +168,25 @@ const AdminUserManagement = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user) => (
-                                <tr key={user.id} style={{ borderBottom: '1px solid #f9f9f9', color: '#333', fontSize: '0.85rem' }}>
+                        {loading ? (
+                            <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>Loading users...</td></tr>
+                        ) : users.length > 0 ? (
+                            users.map((user) => (
+                                <tr key={user._id} style={{ borderBottom: '1px solid #f9f9f9', color: '#333', fontSize: '0.85rem' }}>
                                     <td style={{ padding: '1.25rem 2rem' }}>
                                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                             <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#eee' }}>
-                                                <img src={`https://i.pravatar.cc/150?u=${user.email}`} alt="" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img
+                                                    src={user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
+                                                    alt=""
+                                                    referrerPolicy="no-referrer"
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
                                             </div>
                                             <div>
                                                 <span style={{ display: 'block', fontWeight: 'bold' }}>{user.name}</span>
                                                 <span style={{ fontSize: '0.7rem', color: '#999' }}>{user.email}</span>
+                                                {user.studentId && <span style={{ fontSize: '0.65rem', color: '#bbb', display: 'block' }}>ID: {user.studentId}</span>}
                                             </div>
                                         </div>
                                     </td>
@@ -256,13 +194,14 @@ const AdminUserManagement = () => {
                                         <span style={{
                                             fontSize: '0.6rem',
                                             fontWeight: '800',
-                                            backgroundColor: user.role === 'ADMIN' ? '#fff5f5' : user.role === 'FACULTY' ? '#f5f5ff' : '#f0f9ff',
-                                            color: user.role === 'ADMIN' ? '#d32f2f' : user.role === 'FACULTY' ? '#2979ff' : '#0398f4',
+                                            backgroundColor: user.role === 'admin' ? '#fff5f5' : user.role === 'faculty' ? '#f5f5ff' : '#f0f9ff',
+                                            color: user.role === 'admin' ? '#d32f2f' : user.role === 'faculty' ? '#2979ff' : '#0398f4',
                                             padding: '4px 10px',
-                                            borderRadius: '100px'
+                                            borderRadius: '100px',
+                                            textTransform: 'uppercase'
                                         }}>{user.role}</span>
                                     </td>
-                                    <td style={{ padding: '1.5rem', color: '#666' }}>{user.dept}</td>
+                                    <td style={{ padding: '1.5rem', color: '#666' }}>{user.department || '-'}</td>
                                     <td style={{ padding: '1.5rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                             <span style={{
@@ -280,10 +219,10 @@ const AdminUserManagement = () => {
                                     </td>
                                     <td style={{ padding: '1.5rem 2rem', textAlign: 'right' }}>
                                         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                                            <button style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}>EDIT ROLE</button>
-                                            <span style={{ color: '#eee' }}>|</span>
+                                            {/* <button style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}>EDIT</button> 
+                                            <span style={{ color: '#eee' }}>|</span> */}
                                             <button
-                                                onClick={() => handleBlockToggle(user.id)}
+                                                onClick={() => handleBlockToggle(user)}
                                                 style={{
                                                     background: 'none',
                                                     border: 'none',
@@ -292,6 +231,13 @@ const AdminUserManagement = () => {
                                                 }}
                                             >
                                                 {user.status === 'Blocked' ? 'UNBLOCK' : 'BLOCK'}
+                                            </button>
+                                            <span style={{ color: '#eee' }}>|</span>
+                                            <button
+                                                onClick={() => handleDelete(user._id)}
+                                                style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}
+                                            >
+                                                DELETE
                                             </button>
                                         </div>
                                     </td>
@@ -306,21 +252,11 @@ const AdminUserManagement = () => {
                         )}
                     </tbody>
                 </table>
-
-                {/* Table Footer */}
-                <div style={{ backgroundColor: '#fff', padding: '1.5rem 2rem', borderTop: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#999' }}>SHOWING <strong style={{ color: '#333' }}>{filteredUsers.length}</strong> OF {users.length} USERS</span>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button style={{ border: '1px solid #eee', background: 'none', padding: '6px', borderRadius: '4px', color: '#ccc' }}><ChevronLeft size={16} /></button>
-                        <button style={{ backgroundColor: '#d32f2f', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' }}>1</button>
-                        <button style={{ border: '1px solid #eee', background: 'none', padding: '6px', borderRadius: '4px', color: '#666' }}><ChevronRight size={16} /></button>
-                    </div>
-                </div>
             </div>
 
             {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', marginTop: '3rem' }}>
-                {stats.map((s, i) => (
+                {statCards.map((s, i) => (
                     <div key={i} style={{ backgroundColor: '#0a0a0a', border: '1px solid #111', borderRadius: '16px', padding: '2rem', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                         <div style={{ width: '50px', height: '50px', backgroundColor: s.bg, color: s.color, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <s.icon size={24} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useEvents } from '../../context/EventContext';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
@@ -8,49 +8,32 @@ import StudentQRPass from '../../components/StudentQRPass';
 const StudentDashboard = () => {
     const { events, getStudentRegistrations } = useEvents();
     const { user } = useAuth();
-    const [loading, setLoading] = useState(true);
+
     const [showID, setShowID] = useState(false);
 
-    const [dashboardData, setDashboardData] = useState({
-        metrics: [],
-        liveEvents: [],
-        upcoming: []
-    });
+    // Compute stats from real data
+    const registrations = React.useMemo(() => getStudentRegistrations(user?.id), [getStudentRegistrations, user?.id]);
 
-    useEffect(() => {
-        // Compute stats from real data
-        const registrations = getStudentRegistrations(user?.id);
-        const liveEvents = events.filter(e => e.status === 'active').slice(0, 3);
-        const upcoming = registrations.slice(0, 5);
+    // Derived data
+    const liveEvents = events.filter(e => e.status === 'active').slice(0, 3);
+    const upcoming = registrations.slice(0, 5);
 
-        setDashboardData({
-            metrics: [
-                { label: 'Registered Events', value: registrations.length.toString(), subtext: 'Total registrations', icon: Calendar, color: '#d32f2f' },
-                { label: 'Attended Events', value: '0', subtext: 'Attendance Rate: 0%', icon: PlayCircle, color: '#fff' }, // Placeholder
-                { label: 'Certificates', value: '0', subtext: '0 pending validation', icon: Award, color: '#fff' } // Placeholder
-            ],
-            liveEvents: liveEvents,
-            upcoming: upcoming
-        });
-        setLoading(false);
-    }, [events, user]);
+    const metrics = [
+        { label: 'Registered Events', value: registrations.length.toString(), subtext: 'Total registrations', icon: Calendar, color: '#d32f2f' },
+        { label: 'Attended Events', value: '0', subtext: 'Attendance Rate: 0%', icon: PlayCircle, color: '#fff' }, // Placeholder
+        { label: 'Certificates', value: '0', subtext: '0 pending validation', icon: Award, color: '#fff' } // Placeholder
+    ];
+
+
 
     const handleJoinSession = (eventName) => {
         alert(`Joining session for: ${eventName}`);
         // In a real app, this would navigate to the session URL or open a modal
     };
 
-    if (loading) {
-        return (
-            <DashboardLayout role="student" title="Student Portal">
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', color: '#666' }}>
-                    Loading your dashboard...
-                </div>
-            </DashboardLayout>
-        );
-    }
 
-    const { metrics, liveEvents, upcoming } = dashboardData;
+
+
 
     return (
         <DashboardLayout role="student" title="Student Portal">

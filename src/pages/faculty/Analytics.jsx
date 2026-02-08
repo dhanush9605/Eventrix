@@ -71,6 +71,7 @@ const FacultyAnalytics = () => {
     );
 };
 
+// eslint-disable-next-line no-unused-vars
 const MetricCard = ({ title, value, icon: Icon, color }) => (
     <div style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: '16px', padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>

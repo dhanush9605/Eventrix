@@ -20,3 +20,12 @@ export const createEvent = (eventData) => API.post('/events', eventData);
 export const getEvents = (facultyId) => API.get(`/events?facultyId=${facultyId || ''}`);
 export const markAttendance = (eventId, studentId) => API.post(`/events/${eventId}/attendance`, { studentId });
 export const registerForEvent = (eventId, studentId) => API.post(`/events/${eventId}/register`, { studentId });
+
+// Admin
+export const getAdminStats = () => API.get('/admin/stats');
+export const getAdminStatDetails = (type, id) => API.get(`/admin/stats/details?type=${type}${id ? `&id=${id}` : ''}`);
+
+// User Management
+export const getUsers = (params) => API.get('/admin/users', { params });
+export const updateUserStatus = (id, status) => API.put(`/admin/users/${id}/status`, { status });
+export const deleteUser = (id) => API.delete(`/admin/users/${id}`);
