@@ -12,16 +12,29 @@ const StudentDashboard = () => {
     const [showID, setShowID] = useState(false);
 
     // Compute stats from real data
-    const registrations = React.useMemo(() => getStudentRegistrations(user?.id), [getStudentRegistrations, user?.id]);
+    // Compute stats from real data
+    const studentId = user?.studentId || user?.id;
+    const registrations = React.useMemo(() => getStudentRegistrations(studentId), [getStudentRegistrations, studentId]);
 
     // Derived data
     const liveEvents = events.filter(e => e.status === 'active').slice(0, 3);
     const upcoming = registrations.slice(0, 5);
 
+    // Calculate statistics
+    const attendedCount = registrations.filter(r =>
+        r.eventDetails?.attendance?.some(a => a.studentId === studentId)
+    ).length;
+
+    const certificatesCount = attendedCount; // Assuming 1 attendance = 1 certificate for now
+
+    const attendanceRate = registrations.length > 0
+        ? Math.round((attendedCount / registrations.length) * 100)
+        : 0;
+
     const metrics = [
         { label: 'Registered Events', value: registrations.length.toString(), subtext: 'Total registrations', icon: Calendar, color: '#d32f2f' },
-        { label: 'Attended Events', value: '0', subtext: 'Attendance Rate: 0%', icon: PlayCircle, color: '#fff' }, // Placeholder
-        { label: 'Certificates', value: '0', subtext: '0 pending validation', icon: Award, color: '#fff' } // Placeholder
+        { label: 'Attended Events', value: attendedCount.toString(), subtext: `Attendance Rate: ${attendanceRate}%`, icon: PlayCircle, color: '#fff' },
+        { label: 'Certificates', value: certificatesCount.toString(), subtext: `${certificatesCount} earned`, icon: Award, color: '#fff' }
     ];
 
 

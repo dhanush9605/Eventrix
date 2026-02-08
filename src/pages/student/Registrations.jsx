@@ -15,6 +15,8 @@ const StudentRegistrations = () => {
     const registrations = getStudentRegistrations(user?.studentId || user?.id);
 
     const getStatusStyle = (status) => {
+        if (!status) return { bg: '#333', color: '#ccc', border: '#666' };
+
         switch (status.toLowerCase()) {
             case 'confirmed': return { bg: '#2e7d3215', color: '#4caf50', border: '#2e7d32' };
             case 'pending approval': return { bg: '#ed6c0215', color: '#ff9800', border: '#ed6c02' };

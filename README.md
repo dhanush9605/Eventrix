@@ -1,16 +1,77 @@
-# React + Vite
+# Eventrix - Event Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## How to Run This Project
 
-Currently, two official plugins are available:
+Welcome! If you have received this project as a ZIP file, follow these steps to get it running on your local machine.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Prerequisites
+Make sure you have the following installed:
+- **Node.js** (v16 or higher) - [Download Here](https://nodejs.org/)
+- **MongoDB** (Local or Atlas) - [Download Community Server](https://www.mongodb.com/try/download/community)
 
-## React Compiler
+### 2. Initial Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Important:** You need to install dependencies for both the **Frontend** and the **Backend**.
 
-## Expanding the ESLint configuration
+#### A. Install Backend Dependencies
+1. Open a terminal.
+2. Navigate to the `server` folder:
+   ```bash
+   cd server
+   npm install
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+#### B. Install Frontend Dependencies
+1. Open a new terminal (or go back to the root folder).
+2. Navigate to the main project folder (if not already there):
+   ```bash
+   cd ..
+   npm install
+   ```
+
+### 3. Environment Configuration
+
+You need to set up the configuration keys for the app to work.
+
+#### Backend Configuration
+1. Go to the `server` folder.
+2. Create a new file named `.env`.
+3. Copy the contents from `.env.example` into `.env`.
+4. Update the values in `.env`:
+   - `MONGODB_URI`: Your MongoDB connection string (e.g., `mongodb://localhost:27017/eventrix` or your Atlas URL).
+   - `JWT_SECRET`: Enter any random secret text (e.g., `mysecretkey123`).
+   - `GOOGLE_CLIENT_ID`: (Optional) Required only if you want to test Google Login.
+
+#### Frontend Configuration
+1. Go to the root folder.
+2. Create a new file named `.env`.
+3. Application uses Vite, so typically variables start with `VITE_`. If you have specific frontend keys, add them here.
+   *(If the project uses default API URLs, you might not need to change anything here currently.)*
+
+### 4. Running the Application
+
+You need to run the **Backend** and **Frontend** in two separate terminals.
+
+#### Terminal 1: Start Backend (Server)
+```bash
+cd server
+npm run dev
+```
+*You should see "Server is running on port 5001" and "Connected to MongoDB".*
+
+#### Terminal 2: Start Frontend (Client)
+```bash
+# In the root folder
+npm run dev
+```
+*You should see "Local: http://localhost:5173/".*
+
+### 5. Access the App
+Open your browser and visit: **http://localhost:5173**
+
+---
+
+### Troubleshooting
+- **Black Screen?** Check the console (F12) for errors.
+- **Login fails?** Ensure the Server is running and connected to MongoDB.
+- **Port already in use?** If port 5001 or 5173 is taken, close other node processes or change the port in `.env` and `vite.config.js`.
