@@ -10,9 +10,11 @@ import StudentDashboard from './pages/student/Dashboard';
 import StudentEvents from './pages/student/Events';
 import StudentRegistrations from './pages/student/Registrations';
 import StudentCertificates from './pages/student/Certificates';
+import StudentProfile from './pages/student/Profile';
 import Settings from './pages/Settings'; // Import
 import HelpCenter from './pages/HelpCenter'; // Import
 import FacultyAnalytics from './pages/faculty/Analytics';
+import FacultyScanner from './pages/faculty/Scanner';
 import FacultyApprovals from './pages/faculty/Approvals';
 import FacultyCreateEvent from './pages/faculty/CreateEvent';
 import FacultyManageEvents from './pages/faculty/ManageEvents';
@@ -59,6 +61,12 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/student/profile" element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <StudentProfile />
+            </ProtectedRoute>
+          } />
+
           {/* Shared Routes */}
           <Route path="/settings" element={
             <ProtectedRoute allowedRoles={['student', 'faculty', 'admin']}>
@@ -81,6 +89,12 @@ function App() {
           <Route path="/faculty/approvals" element={
             <ProtectedRoute allowedRoles={['faculty']}>
               <FacultyApprovals />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/faculty/scanner" element={
+            <ProtectedRoute allowedRoles={['faculty']}>
+              <FacultyScanner />
             </ProtectedRoute>
           } />
 

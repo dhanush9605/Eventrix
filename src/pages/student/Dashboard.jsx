@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useEvents } from '../../context/EventContext';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { Calendar, Award, MoreVertical, PlayCircle } from 'lucide-react';
+import { Calendar, Award, MoreVertical, PlayCircle, QrCode, X } from 'lucide-react';
+import StudentQRPass from '../../components/StudentQRPass';
 
 const StudentDashboard = () => {
     const { events, getStudentRegistrations } = useEvents();
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
+    const [showID, setShowID] = useState(false);
 
     const [dashboardData, setDashboardData] = useState({
         metrics: [],
@@ -86,52 +88,112 @@ const StudentDashboard = () => {
             </div>
 
             {/* Live Events Section */}
-            <div style={{ marginBottom: '3rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '2rem' }}>Live Events</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
-                    {liveEvents.map((e, i) => (
-                        <div key={i} style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
-                            <div style={{ position: 'relative', height: '180px' }}>
-                                {e.bannerImage ? (
-                                    <img src={e.bannerImage} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
-                                ) : (
-                                    <div style={{ width: '100%', height: '100%', backgroundColor: '#222' }} />
-                                )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Live Events</h2>
+                <button
+                    onClick={() => setShowID(true)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        backgroundColor: '#d32f2f15',
+                        border: '1px solid #d32f2f30',
+                        color: '#d32f2f',
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#d32f2f25'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#d32f2f15'}
+                >
+                    <QrCode size={16} /> My Digital ID
+                </button>
+            </div>
 
-                                <div style={{ position: 'absolute', top: '12px', left: '12px', backgroundColor: 'rgba(0,0,0,0.6)', padding: '4px 10px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #333' }}>
-                                    <span style={{ color: '#d32f2f', marginRight: '6px' }}>●</span> {e.status.toUpperCase()}
-                                </div>
-                            </div>
-                            <div style={{ padding: '1.5rem' }}>
-                                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{e.title}</h3>
-                                <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '2rem' }}>{e.location}</p>
-                                <button
-                                    onClick={() => handleJoinSession(e.title)}
-                                    style={{
-                                        width: '100%',
-                                        backgroundColor: '#0a0a0a',
-                                        border: '1px solid #1a1a1a',
-                                        color: '#fff',
-                                        padding: '12px',
-                                        borderRadius: '8px',
-                                        fontSize: '0.8rem',
-                                        fontWeight: '700',
-                                        cursor: 'pointer',
-                                        transition: 'background-color 0.2s'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#111'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#0a0a0a'}
-                                >
-                                    {e.status === 'active' ? 'Register Now' : 'View Details'}
-                                </button>
+            {/* ID Modal */}
+            {showID && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.85)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1000,
+                    backdropFilter: 'blur(5px)'
+                }}>
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setShowID(false)}
+                            style={{
+                                position: 'absolute',
+                                top: '-40px',
+                                right: '0',
+                                background: 'none',
+                                border: 'none',
+                                color: '#fff',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontSize: '0.9rem'
+                            }}
+                        >
+                            <X size={20} /> Close
+                        </button>
+                        <StudentQRPass />
+                    </div>
+                </div>
+            )}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+                {liveEvents.map((e, i) => (
+                    <div key={i} style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
+                        <div style={{ position: 'relative', height: '180px' }}>
+                            {e.bannerImage ? (
+                                <img src={e.bannerImage} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                            ) : (
+                                <div style={{ width: '100%', height: '100%', backgroundColor: '#222' }} />
+                            )}
+
+                            <div style={{ position: 'absolute', top: '12px', left: '12px', backgroundColor: 'rgba(0,0,0,0.6)', padding: '4px 10px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #333' }}>
+                                <span style={{ color: '#d32f2f', marginRight: '6px' }}>●</span> {e.status.toUpperCase()}
                             </div>
                         </div>
-                    ))}
-                </div>
+                        <div style={{ padding: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{e.title}</h3>
+                            <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '2rem' }}>{e.location}</p>
+                            <button
+                                onClick={() => handleJoinSession(e.title)}
+                                style={{
+                                    width: '100%',
+                                    backgroundColor: '#0a0a0a',
+                                    border: '1px solid #1a1a1a',
+                                    color: '#fff',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.target.style.backgroundColor = '#111'}
+                                onMouseLeave={(e) => e.target.style.backgroundColor = '#0a0a0a'}
+                            >
+                                {e.status === 'active' ? 'Register Now' : 'View Details'}
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* Upcoming Registrations */}
-            <div>
+            <div style={{ marginTop: '3rem' }}>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '2rem' }}>Upcoming Registrations</h2>
                 <div style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px' }}>
                     {upcoming.map((u, i) => (

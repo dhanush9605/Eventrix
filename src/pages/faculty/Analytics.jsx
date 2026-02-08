@@ -14,7 +14,7 @@ const FacultyAnalytics = () => {
     const { events } = useEvents();
 
     const activeEvents = events.filter(e => e.status === 'active').length;
-    const totalRegistrations = events.reduce((sum, e) => sum + (e.registrations || 0), 0);
+    const totalRegistrations = events.reduce((sum, e) => sum + (e.registrations?.length || 0), 0);
 
     return (
         <DashboardLayout role="faculty" title="Faculty Dashboard">
@@ -53,13 +53,13 @@ const FacultyAnalytics = () => {
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {events.slice(0, 5).map(event => (
-                            <div key={event.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: '#050505', borderRadius: '10px', border: '1px solid #111' }}>
+                            <div key={event._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: '#050505', borderRadius: '10px', border: '1px solid #111' }}>
                                 <div>
                                     <span style={{ display: 'block', fontWeight: 'bold', fontSize: '0.9rem' }}>{event.title}</span>
                                     <span style={{ fontSize: '0.75rem', color: '#666' }}>{event.date}</span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <span style={{ display: 'block', fontWeight: '800', color: '#d32f2f' }}>{event.registrations} Regs</span>
+                                    <span style={{ display: 'block', fontWeight: '800', color: '#d32f2f' }}>{event.registrations?.length || 0} Regs</span>
                                     <span style={{ fontSize: '0.7rem', color: '#00c853' }}>+12% vs last week</span>
                                 </div>
                             </div>

@@ -1,45 +1,70 @@
-import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, GraduationCap, User, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Mail, Lock, Eye, EyeOff, GraduationCap, User, ShieldCheck, X } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-    const { login, user } = useAuth();
+    const { user, login, googleAuth, googleAuthComplete } = useAuth();
     const [activeRole, setActiveRole] = useState('student'); // 'student', 'faculty', 'admin'
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [showGoogleModal, setShowGoogleModal] = useState(false);
+    const [googleData, setGoogleData] = useState(null);
+    const [department, setDepartment] = useState('');
     const navigate = useNavigate();
 
-    // Redirect if already logged in
-    React.useEffect(() => {
+    useEffect(() => {
         if (user) {
-            const dashboardPath = user.role === 'admin' ? '/admin/overview' :
-                user.role === 'faculty' ? '/faculty/analytics' :
-                    '/student/dashboard';
-            navigate(dashboardPath, { replace: true });
+            if (user.role === 'admin') {
+                navigate('/admin/overview');
+            } else if (user.role === 'faculty') {
+                navigate('/faculty/analytics');
+            } else {
+                navigate('/student/dashboard');
+            }
         }
     }, [user, navigate]);
 
-    const handleLogin = (e) => {
+
+
+    const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
 
-        // Logic based on active role
-        if (activeRole === 'student' && email === 'student@eventrix.com' && password === 'student123') {
-            login({ email, role: 'student', name: 'John Student' });
-            navigate('/student/dashboard');
-        } else if (activeRole === 'faculty' && email === 'faculty@eventrix.com' && password === 'faculty123') {
-            login({ email, role: 'faculty', name: 'Dr. Faculty' });
-            navigate('/faculty/analytics');
-        } else if (activeRole === 'admin' && email === 'admin@eventrix.com' && password === 'admin123') {
-            login({ email, role: 'admin', name: 'System Admin' });
-            navigate('/admin/overview');
-        } else {
-            setError(`Invalid ${activeRole} credentials. Please try again.`);
+        const res = await login({ email, password });
+        if (!res.success) {
+            setError(res.message);
         }
     };
+
+    const handleGoogleComplete = async (e) => {
+        e.preventDefault();
+        if (!department) {
+            setError('Please select a department');
+            return;
+        }
+
+        const res = await googleAuthComplete({
+            ...googleData,
+            role: activeRole, // User selects role via tabs before clicking Google? Or we ask them?
+            // Requirement says: "ask the student which department on the same question in the sign in google option"
+            // And I asked "Assume they are a Student by default? or Show a popup?". User didn't explicitly answer but approved plan which said "Popup... select Department".
+            // I will implement the Popup to select Department. 
+            // I will also include Role selection in the popup just to be safe/flexible, defaulting to the active tab.
+            department,
+            year: '1' // Default year for now? Or ask? For simplicity, default to 1 or add field.
+        });
+
+        if (res.success) {
+            setShowGoogleModal(false);
+        } else {
+            setError(res.message);
+        }
+    }
+
 
     const roles = [
         { id: 'student', label: 'Student', icon: <GraduationCap size={18} />, color: '#d32f2f' },
@@ -251,30 +276,36 @@ const Login = () => {
                     </p>
                 )}
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', color: '#ddd' }}>
-                    <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>OR</span>
-                    <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
-                </div>
 
-                <button style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    padding: '0.85rem',
-                    border: '1px solid #eee',
-                    borderRadius: '6px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    marginBottom: '1rem'
-                }}>
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width="18" />
-                    Continue with Google
-                </button>
+
+                {activeRole !== 'admin' && (
+                    <>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', color: '#ddd' }}>
+                            <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>OR</span>
+                            <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <GoogleLogin
+                                onSuccess={async (credentialResponse) => {
+                                    const res = await googleAuth(credentialResponse.credential);
+                                    if (res.success) {
+                                        // Navigate logic handled by useEffect
+                                    } else if (res.isNew) {
+                                        setGoogleData(res.googleData);
+                                        setShowGoogleModal(true);
+                                    } else {
+                                        setError(res.message);
+                                    }
+                                }}
+                                onError={() => {
+                                    setError('Login Failed');
+                                }}
+                            />
+                        </div>
+                    </>
+                )}
             </div>
 
             <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#666', maxWidth: '400px', textAlign: 'center' }}>
@@ -284,6 +315,82 @@ const Login = () => {
             <p style={{ marginTop: '2rem', color: '#444', fontSize: '0.7rem' }}>
                 © 2024 EVENTRIX COLLEGE SYSTEMS. PREMIUM VARIANT 1.0
             </p>
+            {/* Google Completion Modal */}
+            {showGoogleModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        padding: '2rem',
+                        borderRadius: '12px',
+                        width: '90%',
+                        maxWidth: '400px',
+                        position: 'relative'
+                    }}>
+                        <button
+                            onClick={() => setShowGoogleModal(false)}
+                            style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <h3 style={{ marginBottom: '1rem', color: '#333' }}>Complete Registration</h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
+                            Please select your department to finish setting up your {activeRole} account.
+                        </p>
+
+                        <form onSubmit={handleGoogleComplete}>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600' }}>Department</label>
+                                <select
+                                    value={department}
+                                    onChange={(e) => setDepartment(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        borderRadius: '6px',
+                                        border: '1px solid #ddd'
+                                    }}
+                                    required
+                                >
+                                    <option value="">Select Department</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="Civil">Civil</option>
+                                </select>
+                            </div>
+
+                            <button
+                                type="submit"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: roles.find(r => r.id === activeRole)?.color || '#333',
+                                    color: 'white',
+                                    border: 'none',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Complete Signup
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

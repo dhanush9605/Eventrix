@@ -30,7 +30,7 @@ const ManageEvents = () => {
         // Create worksheet data
         const data = [
             ['Event Title', 'Date', 'Time', 'Location', 'Registrations', 'Status'],
-            [event.title, event.date, event.time, event.location, event.registrations, event.status],
+            [event.title, event.date, event.time, event.location, event.registrations?.length || 0, event.status],
             [],
             ['Payment Info'],
             ['Is Paid', event.isPaid ? 'Yes' : 'No'],
@@ -144,19 +144,19 @@ const ManageEvents = () => {
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '2rem' }}>
                         {events.map((event) => (
-                            <div key={event.id} style={eventCardStyle(event.status === 'active')}>
+                            <div key={event._id} style={eventCardStyle(event.status === 'active')}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                                     <span style={statusBadgeStyle(event.status)}>{event.status}</span>
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
-                                            onClick={() => toggleStatus(event.id, event.status)}
+                                            onClick={() => toggleStatus(event._id, event.status)}
                                             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
                                             title={event.status === 'active' ? "Deactivate" : "Activate"}
                                         >
                                             {event.status === 'active' ? <ToggleRight size={20} color="#00c853" /> : <ToggleLeft size={20} />}
                                         </button>
                                         <button
-                                            onClick={() => deleteEvent(event.id)}
+                                            onClick={() => deleteEvent(event._id)}
                                             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
                                             title="Delete"
                                         >
@@ -175,7 +175,7 @@ const ManageEvents = () => {
                                         <MapPin size={16} color="#d32f2f" /> {event.location}
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#666', fontSize: '0.85rem' }}>
-                                        <Users size={16} color="#d32f2f" /> {event.registrations} / {event.maxParticipants || '∞'} Registered
+                                        <Users size={16} color="#d32f2f" /> {event.registrations?.length || 0} / {event.maxParticipants || '∞'} Registered
                                     </div>
                                 </div>
 

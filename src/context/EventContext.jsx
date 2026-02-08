@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import * as api from '../services/api';
 
 const EventContext = createContext();
 
@@ -11,91 +13,131 @@ export const useEvents = () => {
 };
 
 export const EventProvider = ({ children }) => {
-    const [events, setEvents] = useState(() => {
-        const savedEvents = localStorage.getItem('eventrix_events');
-        return savedEvents ? JSON.parse(savedEvents) : [];
-    });
-
+    const { user } = useAuth();
+    const [events, setEvents] = useState([]);
     const [registrations, setRegistrations] = useState(() => {
         const savedRegs = localStorage.getItem('eventrix_registrations');
         return savedRegs ? JSON.parse(savedRegs) : [];
     });
 
+    // Fetch events on load
     useEffect(() => {
-        localStorage.setItem('eventrix_events', JSON.stringify(events));
-    }, [events]);
+        if (user) {
+            const fetchEvents = async () => {
+                try {
+                    // If faculty, filter by their ID. If student/admin, fetch all (or active ones)
+                    // Currently fetching all for everyone, but we could optimize.
+                    // For now, let's just make the API call flexible. 
+                    // To fetch ALL events for students, pass undefined/null if the API supports it.
+                    // The backend currently filters IF facultyId is provided. 
+                    const filterId = user.role === 'faculty' ? (user._id || user.id) : '';
+                    const { data } = await api.getEvents(filterId);
+                    setEvents(data);
+                } catch (error) {
+                    console.error("Failed to fetch events", error);
+                }
+            };
+            fetchEvents();
+        }
+    }, [user]);
 
     useEffect(() => {
         localStorage.setItem('eventrix_registrations', JSON.stringify(registrations));
     }, [registrations]);
 
-    const addEvent = (eventData) => {
-        const newEvent = {
-            ...eventData,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-            status: 'active', // default status
-            registrations: 0,
-            attendance: 0
-        };
-        setEvents(prev => [...prev, newEvent]);
-        return newEvent;
+    const addEvent = async (eventData) => {
+        try {
+            const { data } = await api.createEvent({ ...eventData, facultyId: user._id || user.id });
+            setEvents(prev => [data, ...prev]);
+            return { success: true };
+        } catch (error) {
+            return { success: false, message: 'Failed to create event' };
+        }
     };
 
     const updateEvent = (id, updatedData) => {
         setEvents(prev => prev.map(event =>
-            event.id === id ? { ...event, ...updatedData } : event
+            event._id === id ? { ...event, ...updatedData } : event
         ));
     };
 
     const deleteEvent = (id) => {
-        setEvents(prev => prev.filter(event => event.id !== id));
+        setEvents(prev => prev.filter(event => event._id !== id));
     };
 
     const getEventById = (id) => {
-        return events.find(event => event.id === id);
+        return events.find(event => event._id === id);
     };
 
-    const registerForEvent = (eventId, studentDetails) => {
-        if (!studentDetails || !studentDetails.id) return { success: false, message: 'User not logged in' };
+    const registerForEvent = async (eventId, studentDetails) => {
+        if (!studentDetails || (!studentDetails.studentId && !studentDetails.id))
+            return { success: false, message: 'User not logged in or invalid student ID' };
 
-        // Real-time check against local storage to prevent race conditions from rapid clicks
-        const currentRegs = JSON.parse(localStorage.getItem('eventrix_registrations') || '[]');
-        const isDuplicate = currentRegs.some(r => r.eventId === eventId && r.studentId === studentDetails.id);
+        try {
+            // Use the studentId (e.g., STU-2026-...) preferred, fallback to internal ID if needed but backend expects studentId
+            const sId = studentDetails.studentId || studentDetails.id;
 
-        if (isDuplicate) {
-            return { success: false, message: 'You are already registered for this event.' };
+            await api.registerForEvent(eventId, sId);
+
+            // Optimistically update UI
+            setEvents(prev => prev.map(event => {
+                if (event._id === eventId) {
+                    // Add to registrations array if not present
+                    const exists = event.registrations?.some(r => r.studentId === sId);
+                    if (!exists) {
+                        return {
+                            ...event,
+                            registrations: [...(event.registrations || []), { studentId: sId, registeredAt: new Date() }]
+                        };
+                    }
+                }
+                return event;
+            }));
+
+            return { success: true };
+        } catch (error) {
+            return { success: false, message: error.response?.data?.message || 'Registration failed' };
         }
+    };
 
-        const newRegistration = {
-            id: 'REG-' + Date.now(),
-            eventId,
-            studentId: studentDetails.id,
-            studentName: studentDetails.name,
-            timestamp: new Date().toISOString(),
-            status: 'Confirmed'
-        };
+    const markAttendance = async (eventId, studentId) => {
+        try {
+            const { data } = await api.markAttendance(eventId, studentId);
 
-        // Update state and localStorage immediately
-        const updatedRegs = [...currentRegs, newRegistration];
-        setRegistrations(updatedRegs);
-        localStorage.setItem('eventrix_registrations', JSON.stringify(updatedRegs));
+            // Update local state to reflect change immediately
+            setEvents(prev => prev.map(event => {
+                if (event._id === eventId) {
+                    const alreadyMarked = event.attendance?.some(a => a.studentId === studentId);
+                    if (!alreadyMarked) {
+                        return {
+                            ...event,
+                            attendance: [...(event.attendance || []), { studentId, markedAt: new Date() }]
+                        };
+                    }
+                }
+                return event;
+            }));
 
-        // Update event registration count
-        setEvents(prev => prev.map(event => {
-            if (event.id === eventId) {
-                return { ...event, registrations: (event.registrations || 0) + 1 };
-            }
-            return event;
-        }));
-
-        return { success: true };
+            return { success: true, studentName: data.studentName };
+        } catch (error) {
+            return { success: false, message: error.response?.data?.message || 'Scan failed' };
+        }
     };
 
     const getStudentRegistrations = (studentId) => {
-        return registrations.filter(r => r.studentId === studentId).map(reg => {
-            const event = events.find(e => e.id === reg.eventId);
-            return { ...reg, eventDetails: event };
+        // Filter events where this student is registered
+        return events.filter(event =>
+            event.registrations?.some(reg => reg.studentId === studentId)
+        ).map(event => {
+            const reg = event.registrations.find(r => r.studentId === studentId);
+            return {
+                id: reg._id || event._id, // Use reg ID if available, else event ID as fallback key
+                eventId: event._id,
+                studentId: studentId,
+                status: reg.status,
+                timestamp: reg.registeredAt || reg.timestamp,
+                eventDetails: event
+            };
         });
     };
 
@@ -108,7 +150,8 @@ export const EventProvider = ({ children }) => {
             deleteEvent,
             getEventById,
             registerForEvent,
-            getStudentRegistrations
+            getStudentRegistrations,
+            markAttendance
         }}>
             {children}
         </EventContext.Provider>

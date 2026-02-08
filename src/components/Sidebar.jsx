@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard,
@@ -12,7 +12,8 @@ import {
     HelpCircle,
     LogOut,
     Bell,
-    Plus
+    Plus,
+    Camera
 } from 'lucide-react';
 
 const Sidebar = ({ role }) => {
@@ -28,6 +29,7 @@ const Sidebar = ({ role }) => {
             { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/faculty/analytics' },
             { id: 'create-event', label: 'Create Event', icon: Plus, path: '/faculty/create-event' },
             { id: 'manage-events', label: 'Manage Events', icon: Calendar, path: '/faculty/manage-events' },
+            { id: 'scanner', label: 'Attendance Scanner', icon: Camera, path: '/faculty/scanner' },
             { id: 'approvals', label: 'Approvals', icon: FileCheck, path: '/faculty/approvals' },
         ],
         admin: [
@@ -174,28 +176,75 @@ const Sidebar = ({ role }) => {
                         <LogOut size={16} /> Sign Out
                     </button>
                 ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#222' }}>
-                            <img src={`https://i.pravatar.cc/150?u=${role}`} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                            <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', color: '#fff' }}>
-                                {user?.name || (role === 'student' ? 'Alex Johnson' : 'Dr. Aris Thorne')}
-                            </span>
-                            <span style={{ display: 'block', fontSize: '0.7rem', color: '#666' }}>
-                                {role.charAt(0).toUpperCase() + role.slice(1)} Portal
-                            </span>
-                        </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Link
+                            to={role === 'student' ? '/student/profile' : '#'}
+                            style={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                textDecoration: 'none',
+                                padding: '8px',
+                                borderRadius: '12px',
+                                transition: 'all 0.2s',
+                                cursor: role === 'student' ? 'pointer' : 'default'
+                            }}
+                            className="profile-link"
+                        >
+                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#222', border: '1px solid #333' }}>
+                                {user?.picture ? (
+                                    <img src={user.picture} alt="User" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#2a2a2a', color: '#888' }}>
+                                        <Users size={20} />
+                                    </div>
+                                )}
+                            </div>
+                            <div style={{ flex: 1, overflow: 'hidden' }}>
+                                <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {user?.name || 'User'}
+                                </span>
+                                <span style={{ display: 'block', fontSize: '0.7rem', color: '#666' }}>
+                                    {role.charAt(0).toUpperCase() + role.slice(1)} Portal
+                                </span>
+                            </div>
+                        </Link>
                         <button
                             onClick={logout}
-                            style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
+                            style={{
+                                background: 'transparent',
+                                border: '1px solid #333',
+                                color: '#666',
+                                cursor: 'pointer',
+                                padding: '8px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s',
+                                minWidth: '36px'
+                            }}
                             title="Sign Out"
+                            onMouseOver={(e) => { e.currentTarget.style.borderColor = '#d32f2f'; e.currentTarget.style.color = '#d32f2f'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#666'; }}
                         >
-                            <LogOut size={16} />
+                            <LogOut size={18} />
                         </button>
                     </div>
                 )}
             </div>
+
+            <style>{`
+                .profile-link:hover {
+                    background-color: #111;
+                    transform: translateY(-2px);
+                }
+                .profile-link:hover img {
+                    transform: scale(1.1);
+                    transition: transform 0.3s ease;
+                }
+            `}</style>
         </aside>
     );
 };

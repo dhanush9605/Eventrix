@@ -2,14 +2,17 @@ import React from 'react';
 import { useEvents } from '../../context/EventContext';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { Calendar, MapPin, Clock, MoreVertical, QrCode, Download } from 'lucide-react';
+import { Calendar, MapPin, Clock, MoreVertical, QrCode, Download, X } from 'lucide-react';
+import StudentQRPass from '../../components/StudentQRPass';
 
 const StudentRegistrations = () => {
     const { getStudentRegistrations } = useEvents();
     const { user } = useAuth();
+    const [selectedTicket, setSelectedTicket] = React.useState(null);
+    const [showTicketModal, setShowTicketModal] = React.useState(false);
 
     // Get registrations from context
-    const registrations = getStudentRegistrations(user?.id);
+    const registrations = getStudentRegistrations(user?.studentId || user?.id);
 
     const getStatusStyle = (status) => {
         switch (status.toLowerCase()) {
@@ -54,7 +57,7 @@ const StudentRegistrations = () => {
                                             backgroundColor: '#222' // Fallback bg
                                         }}>
                                             {event.bannerImage ? (
-                                                <img src={event.bannerImage} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img src={event.bannerImage} alt={event.title} referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             ) : (
                                                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.7rem' }}>No Img</div>
                                             )}
@@ -96,19 +99,24 @@ const StudentRegistrations = () => {
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <button style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            backgroundColor: '#fff',
-                                            color: '#000',
-                                            border: 'none',
-                                            padding: '8px 16px',
-                                            borderRadius: '6px',
-                                            fontWeight: '600',
-                                            fontSize: '0.85rem',
-                                            cursor: 'pointer'
-                                        }}>
+                                        <button
+                                            onClick={() => {
+                                                setSelectedTicket(event);
+                                                setShowTicketModal(true);
+                                            }}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
+                                                backgroundColor: '#fff',
+                                                color: '#000',
+                                                border: 'none',
+                                                padding: '8px 16px',
+                                                borderRadius: '6px',
+                                                fontWeight: '600',
+                                                fontSize: '0.85rem',
+                                                cursor: 'pointer'
+                                            }}>
                                             <QrCode size={16} /> View Ticket
                                         </button>
                                     </div>
@@ -118,6 +126,51 @@ const StudentRegistrations = () => {
                     })
                 )}
             </div>
+
+            {/* Ticket Modal */}
+            {showTicketModal && selectedTicket && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.85)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{ position: 'relative', width: '100%', maxWidth: '400px', padding: '1rem' }}>
+                        <button
+                            onClick={() => setShowTicketModal(false)}
+                            style={{
+                                position: 'absolute',
+                                top: '0',
+                                right: '0',
+                                background: 'none',
+                                border: 'none',
+                                color: '#fff',
+                                cursor: 'pointer',
+                                padding: '10px',
+                                zIndex: 10
+                            }}
+                        >
+                            <X size={24} />
+                        </button>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                            <h2 style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center' }}>
+                                Entry Pass for {selectedTicket.title}
+                            </h2>
+                            <StudentQRPass />
+                            <p style={{ color: '#888', fontSize: '0.8rem', textAlign: 'center' }}>
+                                Present this QR code at the event entrance for scanning.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };

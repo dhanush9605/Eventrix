@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useEvents } from '../../context/EventContext';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
@@ -7,6 +8,7 @@ import { Calendar, MapPin, Clock, Filter, Search, X, Check } from 'lucide-react'
 const StudentEvents = () => {
     const { events, registerForEvent } = useEvents();
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [filter, setFilter] = useState('all');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -20,27 +22,32 @@ const StudentEvents = () => {
         : activeEvents.filter(e => e.category.toLowerCase() === filter.toLowerCase());
 
     const handleRegisterClick = (event) => {
+        if (!user) {
+            if (window.confirm("You need to login to register for events. Proceed to login?")) {
+                navigate('/login');
+            }
+            return;
+        }
+
         if (event.isPaid) {
             setSelectedEvent(event);
             setShowPaymentModal(true);
         } else {
-            handleRegistration(event.id);
+            handleRegistration(event._id);
         }
     };
 
-    const handleRegistration = (eventId) => {
+    const handleRegistration = async (eventId) => {
         setRegistering(true);
-        // Simulate network request
-        setTimeout(() => {
-            const result = registerForEvent(eventId, user);
-            setRegistering(false);
-            if (result.success) {
-                alert("Successfully registered!");
-                setShowPaymentModal(false);
-            } else {
-                alert(result.message);
-            }
-        }, 1000);
+        const result = await registerForEvent(eventId, user);
+        setRegistering(false);
+        if (result.success) {
+            alert("Successfully registered!");
+            setShowPaymentModal(false);
+            // Optionally refresh events here if needed, but Context handles opt-update
+        } else {
+            alert(result.message);
+        }
     };
 
     const getStatusColor = (status) => {
@@ -88,7 +95,7 @@ const StudentEvents = () => {
             {/* Events Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
                 {filteredEvents.map(event => (
-                    <div key={event.id} style={{
+                    <div key={event._id} style={{
                         backgroundColor: '#0a0505',
                         border: '1px solid #1a1a1a',
                         borderRadius: '12px',
@@ -98,7 +105,7 @@ const StudentEvents = () => {
                     }}>
                         <div style={{ position: 'relative', height: '160px' }}>
                             {event.bannerImage ? (
-                                <img src={event.bannerImage} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
+                                <img src={event.bannerImage} alt={event.title} referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
                             ) : (
                                 <div style={{ width: '100%', height: '100%', backgroundColor: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444' }}>No Image</div>
                             )}
@@ -212,7 +219,7 @@ const StudentEvents = () => {
 
                             {selectedEvent.paymentQr && (
                                 <div style={{ margin: '1rem auto', width: '200px', height: '200px', backgroundColor: '#fff', padding: '10px', borderRadius: '8px' }}>
-                                    <img src={selectedEvent.paymentQr} alt="Payment QR" style={{ width: '100%', height: '100%' }} />
+                                    <img src={selectedEvent.paymentQr} alt="Payment QR" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%' }} />
                                 </div>
                             )}
 
@@ -228,7 +235,7 @@ const StudentEvents = () => {
                         </div>
 
                         <button
-                            onClick={() => handleRegistration(selectedEvent.id)}
+                            onClick={() => handleRegistration(selectedEvent._id)}
                             disabled={registering}
                             style={{
                                 width: '100%',

@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, GraduationCap, ChevronRight } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, GraduationCap, ChevronRight, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterStudent = () => {
-    const { user } = useAuth();
+    const { user, register, googleAuth, googleAuthComplete } = useAuth();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        department: 'Computer Science', // Default first option
+        year: '1'
+    });
+    const [error, setError] = useState('');
+    const [showGoogleModal, setShowGoogleModal] = useState(false);
+    const [googleData, setGoogleData] = useState(null);
+    const [deptForGoogle, setDeptForGoogle] = useState('Computer Science');
 
     // Redirect if already logged in
     React.useEffect(() => {
@@ -17,6 +30,44 @@ const RegisterStudent = () => {
             navigate(dashboardPath, { replace: true });
         }
     }, [user, navigate]);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        const res = await register({ ...formData, role: 'student' });
+        if (res.success) {
+            navigate('/student/dashboard');
+        } else {
+            setError(res.message);
+        }
+    };
+
+    const handleGoogleComplete = async (e) => {
+        e.preventDefault();
+        const res = await googleAuthComplete({
+            ...googleData,
+            role: 'student',
+            department: deptForGoogle,
+            year: '1'
+        });
+
+        if (res.success) {
+            setShowGoogleModal(false);
+            navigate('/student/dashboard');
+        } else {
+            setError(res.message);
+        }
+    };
 
     return (
         <div style={{
@@ -164,12 +215,18 @@ const RegisterStudent = () => {
                     </button>
                 </div>
 
-                <form style={{ textAlign: 'left' }}>
+                {error && (
+                    <div style={{ backgroundColor: '#fff5f5', color: '#d32f2f', padding: '0.75rem', borderRadius: '6px', fontSize: '0.8rem', marginBottom: '1.5rem', fontWeight: '600', border: '1px solid #ffcdd2' }}>
+                        {error}
+                    </div>
+                )}
+
+                <form style={{ textAlign: 'left' }} onSubmit={handleRegister}>
                     <div style={{ marginBottom: '1.25rem' }}>
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>Full Name</label>
                         <div style={{ position: 'relative' }}>
                             <User style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
-                            <input type="text" placeholder="Enter your full name" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
+                            <input name="name" onChange={handleChange} required type="text" placeholder="Enter your full name" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
                         </div>
                     </div>
 
@@ -177,7 +234,7 @@ const RegisterStudent = () => {
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>College Email</label>
                         <div style={{ position: 'relative' }}>
                             <Mail style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
-                            <input type="email" placeholder="name@college.edu" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
+                            <input name="email" onChange={handleChange} required type="email" placeholder="name@college.edu" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
                         </div>
                     </div>
 
@@ -185,10 +242,18 @@ const RegisterStudent = () => {
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>Password</label>
                         <div style={{ position: 'relative' }}>
                             <Lock style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
-                            <input type={showPassword ? "text" : "password"} placeholder="••••••••" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
+                            <input name="password" onChange={handleChange} required type={showPassword ? "text" : "password"} placeholder="••••••••" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#aaa' }}>
                                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>Confirm Password</label>
+                        <div style={{ position: 'relative' }}>
+                            <Lock style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
+                            <input name="confirmPassword" onChange={handleChange} required type="password" placeholder="••••••••" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.9rem', backgroundColor: '#f9f9f9' }} />
                         </div>
                     </div>
 
@@ -197,12 +262,13 @@ const RegisterStudent = () => {
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>Department</label>
                             <div style={{ position: 'relative' }}>
                                 <GraduationCap style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
-                                <select style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f9f9f9', appearance: 'none', color: '#666' }}>
-                                    <option>Computer Science</option>
-                                    <option>Engineering</option>
-                                    <option>Arts</option>
+                                <select name="department" onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f9f9f9', appearance: 'none', color: '#666' }}>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="Civil">Civil</option>
                                 </select>
-                                <Lock style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={12} />
                             </div>
                         </div>
                         <div>
@@ -210,19 +276,18 @@ const RegisterStudent = () => {
                             <div style={{ position: 'relative' }}>
                                 <Briefcase style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
                                 <input disabled value="Student" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f3f3f3', color: '#888' }} />
-                                <Lock style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={12} />
                             </div>
                         </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem' }}>
-                        <input type="checkbox" style={{ marginTop: '3px' }} />
+                        <input type="checkbox" style={{ marginTop: '3px' }} required />
                         <p style={{ fontSize: '0.7rem', color: '#888', lineHeight: '1.4' }}>
                             By creating an account, I agree to the <a href="#" style={{ color: '#d32f2f', textDecoration: 'none' }}>Terms of Service</a> and <a href="#" style={{ color: '#d32f2f', textDecoration: 'none' }}>Privacy Policy</a>.
                         </p>
                     </div>
 
-                    <button className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '6px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '6px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 'bold' }}>
                         Create Student Account <ChevronRight size={18} />
                     </button>
                 </form>
@@ -233,26 +298,26 @@ const RegisterStudent = () => {
                     <div style={{ flex: 1, height: '1px', backgroundColor: '#eee' }}></div>
                 </div>
 
-                <button style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    padding: '0.85rem',
-                    border: '1px solid #eee',
-                    borderRadius: '6px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    marginBottom: '1.5rem'
-                }}>
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width="18" />
-                    Continue with Google
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <GoogleLogin
+                        onSuccess={async (credentialResponse) => {
+                            const res = await googleAuth(credentialResponse.credential);
+                            if (res.success) {
+                                // Navigate logic handled by useEffect
+                            } else if (res.isNew) {
+                                setGoogleData(res.googleData);
+                                setShowGoogleModal(true);
+                            } else {
+                                setError(res.message);
+                            }
+                        }}
+                        onError={() => {
+                            setError('Registration Failed');
+                        }}
+                    />
+                </div>
 
-                <p style={{ fontSize: '0.85rem' }}>
+                <p style={{ fontSize: '0.85rem', marginTop: '1.5rem' }}>
                     Already have an account? <Link to="/login" style={{ color: '#d32f2f', fontWeight: 'bold', textDecoration: 'none' }}>Back to Login</Link>
                 </p>
             </div>
@@ -260,6 +325,82 @@ const RegisterStudent = () => {
             <p style={{ position: 'absolute', bottom: '2rem', color: '#444', fontSize: '0.7rem' }}>
                 © 2024 EVENTRIX SYSTEM • SECURE STUDENT PORTAL
             </p>
+
+            {/* Google Completion Modal */}
+            {showGoogleModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        padding: '2rem',
+                        borderRadius: '12px',
+                        width: '90%',
+                        maxWidth: '400px',
+                        position: 'relative'
+                    }}>
+                        <button
+                            onClick={() => setShowGoogleModal(false)}
+                            style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <h3 style={{ marginBottom: '1rem', color: '#333' }}>Complete Registration</h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
+                            Please select your department to finish setting up your Student account.
+                        </p>
+
+                        <form onSubmit={handleGoogleComplete}>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600' }}>Department</label>
+                                <select
+                                    value={deptForGoogle}
+                                    onChange={(e) => setDeptForGoogle(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        borderRadius: '6px',
+                                        border: '1px solid #ddd'
+                                    }}
+                                    required
+                                >
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="Civil">Civil</option>
+                                </select>
+                            </div>
+
+                            <button
+                                type="submit"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#d32f2f',
+                                    color: 'white',
+                                    border: 'none',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Complete Signup
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -244,7 +244,7 @@ const AdminUserManagement = () => {
                                     <td style={{ padding: '1.25rem 2rem' }}>
                                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                             <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#eee' }}>
-                                                <img src={`https://i.pravatar.cc/150?u=${user.email}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img src={`https://i.pravatar.cc/150?u=${user.email}`} alt="" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             </div>
                                             <div>
                                                 <span style={{ display: 'block', fontWeight: 'bold' }}>{user.name}</span>
