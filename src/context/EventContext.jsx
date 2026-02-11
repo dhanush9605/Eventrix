@@ -48,12 +48,16 @@ export const EventProvider = ({ children }) => {
 
     const addEvent = React.useCallback(async (eventData) => {
         try {
-            const { data } = await api.createEvent({ ...eventData, facultyId: user._id || user.id });
+            const facultyId = user._id || user.id;
+            const { data } = await api.createEvent({ ...eventData, facultyId });
             setEvents(prev => [data, ...prev]);
             return { success: true };
         } catch (error) {
-            console.error(error);
-            return { success: false, message: 'Failed to create event' };
+            console.error("Event creation failed:", error);
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Failed to create event'
+            };
         }
     }, [user]);
 

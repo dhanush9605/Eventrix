@@ -29,11 +29,19 @@ app.use('/api/', limiter);
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventrix')
-    .then(() => {
+    .then(async () => {
         console.log('Connected to MongoDB');
-        seedAdmin();
+        await seedAdmin();
+
+        // Only start server after successful DB connection
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
     })
-    .catch((err) => console.error('MongoDB connection error:', err));
+    .catch((err) => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1); // Exit if DB connection fails
+    });
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -42,8 +50,4 @@ app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
     res.send('Eventrix Backend is running');
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });

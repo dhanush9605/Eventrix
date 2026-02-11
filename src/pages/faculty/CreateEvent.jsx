@@ -68,12 +68,15 @@ const CreateEvent = () => {
         setLoading(true);
 
         try {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            addEvent(formData);
-            navigate('/faculty/manage-events');
+            const result = await addEvent(formData);
+            if (result.success) {
+                navigate('/faculty/manage-events');
+            } else {
+                alert(result.message || "Failed to create event");
+            }
         } catch (error) {
             console.error("Error creating event:", error);
+            alert("Something went wrong while creating the event.");
         } finally {
             setLoading(false);
         }

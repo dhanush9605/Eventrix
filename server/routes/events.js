@@ -7,13 +7,21 @@ const router = express.Router();
 // Create Event
 router.post('/', async (req, res) => {
     try {
-        const { title, date, location, description, facultyId } = req.body;
+        const {
+            title, category, date, time, location, description,
+            maxParticipants, deadline, isPaid, fee, upiId,
+            paymentQr, bannerImage, facultyId
+        } = req.body;
+
         const newEvent = await Event.create({
-            title, date, location, description, facultyId
+            title, category, date, time, location, description,
+            maxParticipants, deadline, isPaid, fee, upiId,
+            paymentQr, bannerImage, facultyId
         });
         res.status(201).json(newEvent);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating event' });
+        console.error("Error creating event:", error);
+        res.status(500).json({ message: 'Error creating event', error: error.message });
     }
 });
 
