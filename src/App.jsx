@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -27,125 +27,123 @@ import AdminReports from './pages/admin/Reports';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register/student" element={<RegisterStudent />} />
-          <Route path="/register/faculty" element={<RegisterFaculty />} />
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register/student" element={<RegisterStudent />} />
+        <Route path="/register/faculty" element={<RegisterFaculty />} />
 
-          {/* Protected Routes */}
-          <Route path="/student/dashboard" element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <StudentDashboard />
-            </ProtectedRoute>
-          } />
+        {/* Protected Routes */}
+        <Route path="/student/dashboard" element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentDashboard />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/student/events" element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <StudentEvents />
-            </ProtectedRoute>
-          } />
+        <Route path="/student/events" element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentEvents />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/student/registrations" element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <StudentRegistrations />
-            </ProtectedRoute>
-          } />
+        <Route path="/student/registrations" element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentRegistrations />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/student/certificates" element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <StudentCertificates />
-            </ProtectedRoute>
-          } />
+        <Route path="/student/certificates" element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentCertificates />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/student/profile" element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <StudentProfile />
-            </ProtectedRoute>
-          } />
+        <Route path="/student/profile" element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentProfile />
+          </ProtectedRoute>
+        } />
 
-          {/* Shared Routes */}
-          <Route path="/settings" element={
-            <ProtectedRoute allowedRoles={['student', 'faculty', 'admin']}>
-              <Settings />
-            </ProtectedRoute>
-          } />
+        {/* Shared Routes */}
+        <Route path="/settings" element={
+          <ProtectedRoute allowedRoles={['student', 'faculty', 'admin']}>
+            <Settings />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/help-center" element={
-            <ProtectedRoute allowedRoles={['student', 'faculty', 'admin']}>
-              <HelpCenter />
-            </ProtectedRoute>
-          } />
+        <Route path="/help-center" element={
+          <ProtectedRoute allowedRoles={['student', 'faculty', 'admin']}>
+            <HelpCenter />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/faculty/analytics" element={
-            <ProtectedRoute allowedRoles={['faculty']}>
-              <FacultyAnalytics />
-            </ProtectedRoute>
-          } />
+        <Route path="/faculty/analytics" element={
+          <ProtectedRoute allowedRoles={['faculty']}>
+            <FacultyAnalytics />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/faculty/approvals" element={
-            <ProtectedRoute allowedRoles={['faculty']}>
-              <FacultyApprovals />
-            </ProtectedRoute>
-          } />
+        <Route path="/faculty/approvals" element={
+          <ProtectedRoute allowedRoles={['faculty']}>
+            <FacultyApprovals />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/faculty/scanner" element={
-            <ProtectedRoute allowedRoles={['faculty']}>
-              <FacultyScanner />
-            </ProtectedRoute>
-          } />
+        <Route path="/faculty/scanner" element={
+          <ProtectedRoute allowedRoles={['faculty']}>
+            <FacultyScanner />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/faculty/create-event" element={
-            <ProtectedRoute allowedRoles={['faculty']}>
-              <FacultyCreateEvent />
-            </ProtectedRoute>
-          } />
+        <Route path="/faculty/create-event" element={
+          <ProtectedRoute allowedRoles={['faculty']}>
+            <FacultyCreateEvent />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/faculty/manage-events" element={
-            <ProtectedRoute allowedRoles={['faculty']}>
-              <FacultyManageEvents />
-            </ProtectedRoute>
-          } />
+        <Route path="/faculty/manage-events" element={
+          <ProtectedRoute allowedRoles={['faculty']}>
+            <FacultyManageEvents />
+          </ProtectedRoute>
+        } />
 
-          {/* Admin Routes */}
-          <Route path="/admin/overview" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminOverview />
-            </ProtectedRoute>
-          } />
+        {/* Admin Routes */}
+        <Route path="/admin/overview" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminOverview />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/users" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminUsers />
-            </ProtectedRoute>
-          } />
+        <Route path="/admin/users" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminUsers />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/departments" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminDepartments />
-            </ProtectedRoute>
-          } />
+        <Route path="/admin/departments" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminDepartments />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/events" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminEvents />
-            </ProtectedRoute>
-          } />
+        <Route path="/admin/events" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminEvents />
+          </ProtectedRoute>
+        } />
 
-          <Route path="/admin/reports" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminReports />
-            </ProtectedRoute>
-          } />
+        <Route path="/admin/reports" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminReports />
+          </ProtectedRoute>
+        } />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
