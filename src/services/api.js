@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api' });
+const getBaseURL = () => {
+    const url = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    return url.endsWith('/api') ? url : `${url}/api`;
+};
+
+const API = axios.create({ baseURL: getBaseURL() });
 
 API.interceptors.request.use((req) => {
     if (localStorage.getItem('eventrix_user')) {

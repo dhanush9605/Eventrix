@@ -45,8 +45,10 @@ You need to set up the configuration keys for the app to work.
 #### Frontend Configuration
 1. Go to the root folder.
 2. Create a new file named `.env`.
-3. Application uses Vite, so typically variables start with `VITE_`. If you have specific frontend keys, add them here.
-   *(If the project uses default API URLs, you might not need to change anything here currently.)*
+3. Copy the contents from `.env.example` into `.env`.
+4. Update the values in `.env`:
+   - `VITE_API_URL`: Your backend API URL (e.g., `http://localhost:5001/api`). **Important:** It must end with `/api`.
+   - `VITE_GOOGLE_CLIENT_ID`: (Optional) Get this from Google Cloud Console. If you leave it as the placeholder, Google Sign-In will not work, but manual login will still function.
 
 ### 4. Running the Application
 
