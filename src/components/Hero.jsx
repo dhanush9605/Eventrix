@@ -29,17 +29,17 @@ const Hero = () => {
                         boxShadow: '0 0 8px #d32f2f'
                     }}></span>
                     <span style={{
-                        fontSize: '0.7rem',
+                        fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
                         fontWeight: '700',
                         textTransform: 'uppercase',
                         color: '#d32f2f',
                         letterSpacing: '0.1em'
-                    }}>New: Live for Fall 2024</span>
+                    }}>New: Live for Fall 2026</span>
                 </div>
 
                 {/* Heading */}
                 <h1 style={{
-                    fontSize: 'clamp(4rem, 10vw, 8rem)',
+                    fontSize: 'clamp(3rem, 12vw, 8rem)',
                     lineHeight: '0.9',
                     marginBottom: '1.5rem',
                     letterSpacing: '-0.04em'
@@ -49,17 +49,24 @@ const Hero = () => {
 
                 {/* Subtext */}
                 <p style={{
-                    fontSize: '1.25rem',
+                    fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
                     color: '#e0e0e0',
                     maxWidth: '600px',
                     margin: '0 auto 3rem',
-                    fontWeight: '400'
+                    fontWeight: '400',
+                    padding: '0 1rem'
                 }}>
                     The premium, high-performance ecosystem for <i style={{ fontWeight: '600' }}>college event management</i>.
                 </p>
 
                 {/* CTAs */}
-                <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+                <div style={{
+                    display: 'flex',
+                    gap: '1.5rem',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    padding: '0 1rem'
+                }}>
                     <a href="#events" className="btn btn-primary" style={{ padding: '1rem 2.5rem', textDecoration: 'none' }}>Explore Events</a>
                     <Link to="/login" className="btn btn-outline-gray" style={{ padding: '1rem 2.5rem', textDecoration: 'none' }}>View Demo</Link>
                 </div>
@@ -69,3 +76,4 @@ const Hero = () => {
 };
 
 export default Hero;
+

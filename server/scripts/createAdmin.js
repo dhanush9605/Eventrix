@@ -18,18 +18,11 @@ const seedAdmin = async () => {
         const email = process.env.ADMIN_EMAIL || 'admin@eventrix.com';
         const password = process.env.ADMIN_PASSWORD || 'admin123';
 
-        // Basic check to ensure we don't use default weak passwords in production without warning
-        if (password === 'admin123') {
-            console.warn('WARNING: Using default password "admin123". Please set ADMIN_PASSWORD in .env.');
-        }
-
         const hashedPassword = await bcrypt.hash(password, 12);
 
         let admin = await User.findOne({ email });
 
-        if (admin) {
-            console.log('Admin user check: User already exists.');
-        } else {
+        if (!admin) {
             admin = await User.create({
                 name: 'System Admin',
                 email,

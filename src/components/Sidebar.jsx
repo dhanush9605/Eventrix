@@ -54,10 +54,12 @@ const Sidebar = ({ role }) => {
             flexDirection: 'column',
             position: 'fixed',
             left: 0,
-            top: 0
+            top: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden'
         }}>
             {/* Sidebar Logo */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3rem', paddingLeft: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3rem', paddingLeft: '0.5rem', flexShrink: 0 }}>
                 <div style={{ width: '38px', height: '38px', backgroundColor: '#d32f2f', borderRadius: '8px', boxShadow: '0 0 15px rgba(211, 47, 47, 0.4)' }}></div>
                 <div>
                     <span style={{ fontSize: '1.4rem', fontWeight: '800', display: 'block', lineHeight: 1, letterSpacing: '-0.5px' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
@@ -68,7 +70,7 @@ const Sidebar = ({ role }) => {
             </div>
 
             {/* Navigation */}
-            <nav style={{ flex: 1 }}>
+            <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {currentMenu.map((item) => (
                         <li key={item.id}>
@@ -119,8 +121,6 @@ const Sidebar = ({ role }) => {
                 <div style={{ marginTop: '2.5rem' }}>
                     <span style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em', paddingLeft: '1rem', display: 'block', marginBottom: '0.75rem' }}>Support</span>
                     <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {/* The 'Help Center' NavLink was not found in the original document, so no changes were made here. */}
-                        {/* If you intended to remove the 'Settings' NavLink, please specify. */}
                         <li>
                             <NavLink
                                 to="/settings"
@@ -167,7 +167,7 @@ const Sidebar = ({ role }) => {
             </nav>
 
             {/* User Profile */}
-            <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid #1a1a1a' }}>
+            <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid #1a1a1a', flexShrink: 0 }}>
                 {role === 'admin' ? (
                     <button
                         onClick={logout}

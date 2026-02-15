@@ -313,7 +313,7 @@ const RegisterFaculty = () => {
 
             <footer style={{ marginTop: '3rem', width: '100%', textAlign: 'center' }}>
                 <p style={{ color: '#444', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-                    © 2024 EVENTRIX GLOBAL INSTITUTIONAL SYSTEM
+                    © 2026 EVENTRIX GLOBAL INSTITUTIONAL SYSTEM
                 </p>
             </footer>
 

@@ -323,7 +323,7 @@ const RegisterStudent = () => {
             </div>
 
             <p style={{ position: 'absolute', bottom: '2rem', color: '#444', fontSize: '0.7rem' }}>
-                © 2024 EVENTRIX SYSTEM • SECURE STUDENT PORTAL
+                © 2026 EVENTRIX SYSTEM • SECURE STUDENT PORTAL
             </p>
 
             {/* Google Completion Modal */}

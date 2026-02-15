@@ -5,9 +5,9 @@ import { Award, Download, Calendar, CheckCircle } from 'lucide-react';
 const StudentCertificates = () => {
     const certificates = [
         {
-            id: 'CERT-2024-001',
+            id: 'CERT-2026-001',
             title: 'Intro to Robotics Workshop',
-            issueDate: 'Sep 15, 2024',
+            issueDate: 'Sep 15, 2026',
             issuer: 'Robotics Club',
             grade: 'Distinction',
             image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400&auto=format&fit=crop'

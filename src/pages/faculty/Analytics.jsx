@@ -2,17 +2,13 @@ import React from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useEvents } from '../../context/EventContext';
 import {
-    TrendingUp,
-    TrendingDown,
     Calendar,
     Users,
-    Activity,
     Star
 } from 'lucide-react';
 
 const FacultyAnalytics = () => {
     const { events } = useEvents();
-
     const activeEvents = events.filter(e => e.status === 'active').length;
     const totalRegistrations = events.reduce((sum, e) => sum + (e.registrations?.length || 0), 0);
 
@@ -38,10 +34,10 @@ const FacultyAnalytics = () => {
                     color="#00c853"
                 />
                 <MetricCard
-                    title="AVERAGE ENGAGEMENT"
-                    value="84%"
-                    icon={Activity}
-                    color="#2979ff"
+                    title="AVERAGE RATING"
+                    value="4.8"
+                    icon={Star}
+                    color="#ffc107"
                 />
             </div>
 
@@ -59,8 +55,11 @@ const FacultyAnalytics = () => {
                                     <span style={{ fontSize: '0.75rem', color: '#666' }}>{event.date}</span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', color: '#ffc107', marginBottom: '4px' }}>
+                                        <Star size={12} fill="#ffc107" />
+                                        <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>-</span>
+                                    </div>
                                     <span style={{ display: 'block', fontWeight: '800', color: '#d32f2f' }}>{event.registrations?.length || 0} Regs</span>
-                                    <span style={{ fontSize: '0.7rem', color: '#00c853' }}>+12% vs last week</span>
                                 </div>
                             </div>
                         ))}

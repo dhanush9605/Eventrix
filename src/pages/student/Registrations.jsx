@@ -2,14 +2,16 @@ import React from 'react';
 import { useEvents } from '../../context/EventContext';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { Calendar, MapPin, Clock, MoreVertical, QrCode, Download, X } from 'lucide-react';
+import { Calendar, MapPin, Clock, MoreVertical, QrCode, Download, X, Star } from 'lucide-react';
 import StudentQRPass from '../../components/StudentQRPass';
+import FeedbackModal from '../../components/FeedbackModal';
 
 const StudentRegistrations = () => {
     const { getStudentRegistrations } = useEvents();
     const { user } = useAuth();
     const [selectedTicket, setSelectedTicket] = React.useState(null);
     const [showTicketModal, setShowTicketModal] = React.useState(false);
+    const [ratingEvent, setRatingEvent] = React.useState(null);
 
     // Get registrations from context
     const registrations = getStudentRegistrations(user?.studentId || user?.id);
@@ -121,6 +123,27 @@ const StudentRegistrations = () => {
                                             }}>
                                             <QrCode size={16} /> View Ticket
                                         </button>
+
+                                        {/* Rate Event Button (Shown if event has passed) */}
+                                        {new Date(event.date) < new Date() && (
+                                            <button
+                                                onClick={() => setRatingEvent(event)}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    backgroundColor: '#111',
+                                                    color: '#ffc107',
+                                                    border: '1px solid #ffc107',
+                                                    padding: '8px 16px',
+                                                    borderRadius: '6px',
+                                                    fontWeight: '600',
+                                                    fontSize: '0.85rem',
+                                                    cursor: 'pointer'
+                                                }}>
+                                                <Star size={16} fill="#ffc107" /> Rate Event
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -172,6 +195,14 @@ const StudentRegistrations = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Feedback Modal */}
+            {ratingEvent && (
+                <FeedbackModal
+                    event={ratingEvent}
+                    onClose={() => setRatingEvent(null)}
+                />
             )}
         </DashboardLayout>
     );

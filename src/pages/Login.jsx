@@ -80,14 +80,14 @@ const Login = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '2rem',
+            padding: 'clamp(1rem, 3vw, 2rem)',
             position: 'relative'
         }}>
             {/* Top Logo */}
             <Link to="/" style={{
                 position: 'absolute',
-                top: '2rem',
-                left: '2rem',
+                top: 'clamp(1rem, 3vw, 2rem)',
+                left: 'clamp(1rem, 3vw, 2rem)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -95,13 +95,13 @@ const Login = () => {
                 color: 'white'
             }}>
                 <div style={{ width: '24px', height: '24px', backgroundColor: '#d32f2f', borderRadius: '3px' }}></div>
-                <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
+                <span style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', fontWeight: 'bold' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
             </Link>
 
-            <button style={{
+            <button className="hide-mobile" style={{
                 position: 'absolute',
-                top: '2rem',
-                right: '2rem',
+                top: 'clamp(1rem, 3vw, 2rem)',
+                right: 'clamp(1rem, 3vw, 2rem)',
                 backgroundColor: '#111',
                 border: '1px solid #222',
                 color: 'white',
@@ -119,7 +119,7 @@ const Login = () => {
                 width: '100%',
                 maxWidth: '420px',
                 borderRadius: '16px',
-                padding: '2.5rem 2rem',
+                padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 3vw, 2rem)',
                 textAlign: 'center',
                 color: '#333',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
@@ -139,7 +139,7 @@ const Login = () => {
                     {roles.find(r => r.id === activeRole).icon}
                 </div>
 
-                <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Login</h2>
+                <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 1.75rem)', fontWeight: 'bold', marginBottom: '0.5rem' }}>Login</h2>
                 <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '2rem' }}>Access your Eventrix account</p>
 
                 {/* Role Tabs */}
@@ -313,7 +313,7 @@ const Login = () => {
             </p>
 
             <p style={{ marginTop: '2rem', color: '#444', fontSize: '0.7rem' }}>
-                © 2024 EVENTRIX COLLEGE SYSTEMS. PREMIUM VARIANT 1.0
+                © 2026 EVENTRIX COLLEGE SYSTEMS. PREMIUM VARIANT 1.0
             </p>
             {/* Google Completion Modal */}
             {showGoogleModal && (

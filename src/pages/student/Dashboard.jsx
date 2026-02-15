@@ -12,7 +12,6 @@ const StudentDashboard = () => {
     const [showID, setShowID] = useState(false);
 
     // Compute stats from real data
-    // Compute stats from real data
     const studentId = user?.studentId || user?.id;
     const registrations = React.useMemo(() => getStudentRegistrations(studentId), [getStudentRegistrations, studentId]);
 
@@ -25,7 +24,7 @@ const StudentDashboard = () => {
         r.eventDetails?.attendance?.some(a => a.studentId === studentId)
     ).length;
 
-    const certificatesCount = attendedCount; // Assuming 1 attendance = 1 certificate for now
+    const certificatesCount = attendedCount;
 
     const attendanceRate = registrations.length > 0
         ? Math.round((attendedCount / registrations.length) * 100)
@@ -37,27 +36,25 @@ const StudentDashboard = () => {
         { label: 'Certificates', value: certificatesCount.toString(), subtext: `${certificatesCount} earned`, icon: Award, color: '#fff' }
     ];
 
-
-
     const handleJoinSession = (eventName) => {
         alert(`Joining session for: ${eventName}`);
-        // In a real app, this would navigate to the session URL or open a modal
     };
-
-
-
-
 
     return (
         <DashboardLayout role="student" title="Student Portal">
             {/* Metrics Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(250px, 100%), 1fr))',
+                gap: '1.5rem',
+                marginBottom: '3rem'
+            }}>
                 {metrics.map((m, i) => (
                     <div key={i} style={{
                         backgroundColor: '#0a0505',
                         border: '1px solid #1a1a1a',
                         borderRadius: '12px',
-                        padding: '2rem',
+                        padding: 'clamp(1.5rem, 3vw, 2rem)',
                         position: 'relative',
                         transition: 'transform 0.2s ease, border-color 0.2s ease',
                         cursor: 'pointer'
@@ -74,7 +71,7 @@ const StudentDashboard = () => {
                         <span style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '1.5rem' }}>{m.label}</span>
                         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                             <div>
-                                <span style={{ fontSize: '3rem', fontWeight: '700', lineHeight: 1 }}>{m.value}</span>
+                                <span style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: '700', lineHeight: 1 }}>{m.value}</span>
                                 <p style={{ fontSize: '0.75rem', color: m.color === '#d32f2f' ? '#d32f2f' : '#666', marginTop: '1rem', fontWeight: '600' }}>{m.subtext}</p>
                             </div>
                             <m.icon size={24} color="#1a1a1a" />
@@ -84,8 +81,8 @@ const StudentDashboard = () => {
             </div>
 
             {/* Live Events Section */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Live Events</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <h2 style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.25rem)', fontWeight: 'bold' }}>Live Events</h2>
                 <button
                     onClick={() => setShowID(true)}
                     style={{
@@ -100,7 +97,8 @@ const StudentDashboard = () => {
                         fontSize: '0.8rem',
                         fontWeight: '700',
                         cursor: 'pointer',
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s',
+                        minHeight: '44px'
                     }}
                     onMouseEnter={(e) => e.target.style.backgroundColor = '#d32f2f25'}
                     onMouseLeave={(e) => e.target.style.backgroundColor = '#d32f2f15'}
@@ -122,9 +120,10 @@ const StudentDashboard = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     zIndex: 1000,
-                    backdropFilter: 'blur(5px)'
+                    backdropFilter: 'blur(5px)',
+                    padding: '1rem'
                 }}>
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative', maxWidth: '100%' }}>
                         <button
                             onClick={() => setShowID(false)}
                             style={{
@@ -138,7 +137,9 @@ const StudentDashboard = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '8px',
-                                fontSize: '0.9rem'
+                                fontSize: '0.9rem',
+                                minHeight: '44px',
+                                padding: '0.5rem'
                             }}
                         >
                             <X size={20} /> Close
@@ -147,7 +148,12 @@ const StudentDashboard = () => {
                     </div>
                 </div>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+                gap: '1.5rem'
+            }}>
                 {liveEvents.map((e, i) => (
                     <div key={i} style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
                         <div style={{ position: 'relative', height: '180px' }}>
@@ -176,7 +182,8 @@ const StudentDashboard = () => {
                                     fontSize: '0.8rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
-                                    transition: 'background-color 0.2s'
+                                    transition: 'background-color 0.2s',
+                                    minHeight: '44px'
                                 }}
                                 onMouseEnter={(e) => e.target.style.backgroundColor = '#111'}
                                 onMouseLeave={(e) => e.target.style.backgroundColor = '#0a0a0a'}
@@ -190,17 +197,19 @@ const StudentDashboard = () => {
 
             {/* Upcoming Registrations */}
             <div style={{ marginTop: '3rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '2rem' }}>Upcoming Registrations</h2>
+                <h2 style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.25rem)', fontWeight: 'bold', marginBottom: '2rem' }}>Upcoming Registrations</h2>
                 <div style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px' }}>
                     {upcoming.map((u, i) => (
                         <div key={i} style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            padding: '1.5rem 2rem',
-                            borderBottom: i === upcoming.length - 1 ? 'none' : '1px solid #1a1a1a'
+                            padding: 'clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem)',
+                            borderBottom: i === upcoming.length - 1 ? 'none' : '1px solid #1a1a1a',
+                            flexWrap: 'wrap',
+                            gap: '1rem'
                         }}>
-                            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flex: '1 1 200px' }}>
                                 <div style={{ backgroundColor: '#111', padding: '12px', borderRadius: '8px', color: '#444' }}>
                                     <Calendar size={20} />
                                 </div>
@@ -210,7 +219,7 @@ const StudentDashboard = () => {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flex: '0 1 auto' }}>
                                 <div style={{ textAlign: 'right' }}>
                                     <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#888' }}>
                                         {u.eventDetails?.isPaid ? 'Paid Entry' : 'Standard Pass'}
@@ -228,3 +237,4 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+

@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth.js';
 import eventRoutes from './routes/events.js';
 import adminRoutes from './routes/admin.js';
+import feedbackRoutes from './routes/feedback.js';
 import seedAdmin from './scripts/createAdmin.js';
 
 dotenv.config();
@@ -51,6 +52,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventrix'
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 app.get('/', (req, res) => {
     res.send('Eventrix Backend is running');

@@ -20,6 +20,7 @@ export const EventProvider = ({ children }) => {
         const savedRegs = localStorage.getItem('eventrix_registrations');
         return savedRegs ? JSON.parse(savedRegs) : [];
     });
+    const [eventFeedbacks, setEventFeedbacks] = useState({}); // { eventId: [feedback] }
 
     // Fetch events on load
     useEffect(() => {
@@ -46,20 +47,41 @@ export const EventProvider = ({ children }) => {
         localStorage.setItem('eventrix_registrations', JSON.stringify(registrations));
     }, [registrations]);
 
-    const addEvent = React.useCallback(async (eventData) => {
+    const addEvent = async (eventData) => {
         try {
             const facultyId = user._id || user.id;
             const { data } = await api.createEvent({ ...eventData, facultyId });
             setEvents(prev => [data, ...prev]);
-            return { success: true };
+            return { success: true, data };
         } catch (error) {
-            console.error("Event creation failed:", error);
-            return {
-                success: false,
-                message: error.response?.data?.message || 'Failed to create event'
-            };
+            return { success: false, message: error.response?.data?.message || 'Error creating event' };
         }
-    }, [user]);
+    };
+
+    const submitRating = async (feedbackData) => {
+        try {
+            const { data } = await api.submitFeedback(feedbackData);
+            // Optionally update local feedback state if needed
+            setEventFeedbacks(prev => ({
+                ...prev,
+                [feedbackData.eventId]: [data, ...(prev[feedbackData.eventId] || [])]
+            }));
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, message: error.response?.data?.message || 'Error submitting feedback' };
+        }
+    };
+
+    const fetchEventFeedback = async (eventId) => {
+        try {
+            const { data } = await api.getEventFeedback(eventId);
+            setEventFeedbacks(prev => ({ ...prev, [eventId]: data }));
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error fetching feedback:', error);
+            return { success: false };
+        }
+    };
 
     const updateEvent = (id, updatedData) => {
         setEvents(prev => prev.map(event =>
@@ -157,7 +179,10 @@ export const EventProvider = ({ children }) => {
             getEventById,
             registerForEvent,
             getStudentRegistrations,
-            markAttendance
+            markAttendance,
+            submitRating,
+            fetchEventFeedback,
+            eventFeedbacks
         }}>
             {children}
         </EventContext.Provider>

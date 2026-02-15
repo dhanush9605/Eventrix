@@ -9,7 +9,7 @@ const FacultyApprovals = () => {
             id: 1,
             user: 'Marcus Chen',
             event: 'Generative AI Workshop 2026',
-            date: 'Oct 24, 2024',
+            date: 'Oct 24, 2026',
             category: 'ACADEMIC'
         }
     ];

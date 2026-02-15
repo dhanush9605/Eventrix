@@ -34,3 +34,8 @@ export const getAdminStatDetails = (type, id) => API.get(`/admin/stats/details?t
 export const getUsers = (params) => API.get('/admin/users', { params });
 export const updateUserStatus = (id, status) => API.put(`/admin/users/${id}/status`, { status });
 export const deleteUser = (id) => API.delete(`/admin/users/${id}`);
+
+// Feedback
+export const submitFeedback = (feedbackData) => API.post('/feedback', feedbackData);
+export const getEventFeedback = (eventId) => API.get(`/feedback/event/${eventId}`);
+export const getFeedbackStats = () => API.get('/feedback/stats');
