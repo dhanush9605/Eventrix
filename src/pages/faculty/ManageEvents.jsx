@@ -14,7 +14,8 @@ import {
     ArrowUpRight,
     Trash2,
     ToggleLeft,
-    ToggleRight
+    ToggleRight,
+    Edit // Import Edit
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -127,9 +128,6 @@ const ManageEvents = () => {
                         <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#444' }} />
                         <input type="text" placeholder="Search events by title or location..." style={searchInputStyle} />
                     </div>
-                    <button style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a', color: '#888', padding: '0 1.5rem', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <Filter size={18} /> Filters
-                    </button>
                 </div>
 
                 {events.length === 0 ? (
@@ -156,7 +154,11 @@ const ManageEvents = () => {
                                             {event.status === 'active' ? <ToggleRight size={20} color="#00c853" /> : <ToggleLeft size={20} />}
                                         </button>
                                         <button
-                                            onClick={() => deleteEvent(event._id)}
+                                            onClick={() => {
+                                                if (window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+                                                    deleteEvent(event._id);
+                                                }
+                                            }}
                                             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
                                             title="Delete"
                                         >
@@ -180,17 +182,17 @@ const ManageEvents = () => {
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '1rem', borderTop: '1px solid #1a1a1a', paddingTop: '1.5rem' }}>
-                                    <button style={{ flex: 1, backgroundColor: '#111', border: '1px solid #222', color: '#fff', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                        <QrCode size={16} /> QR CODE
+                                    <button
+                                        onClick={() => navigate(`/faculty/edit-event/${event._id}`)}
+                                        style={{ flex: 1, backgroundColor: '#111', border: '1px solid #222', color: '#fff', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer' }}
+                                    >
+                                        <Edit size={16} /> EDIT
                                     </button>
                                     <button
                                         onClick={() => exportToExcel(event)}
                                         style={{ flex: 1, backgroundColor: '#111', border: '1px solid #222', color: '#fff', padding: '10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer' }}
                                     >
                                         <Download size={16} /> EXCEL
-                                    </button>
-                                    <button style={{ backgroundColor: '#d32f2f10', color: '#d32f2f', border: 'none', width: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <ArrowUpRight size={18} />
                                     </button>
                                 </div>
                             </div>

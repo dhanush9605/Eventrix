@@ -22,9 +22,10 @@ export const googleAuthComplete = (formData) => API.post('/auth/google/complete'
 
 // Events
 export const createEvent = (eventData) => API.post('/events', eventData);
+export const updateEvent = (id, eventData) => API.put(`/events/${id}`, eventData);
 export const getEvents = (facultyId) => API.get(`/events?facultyId=${facultyId || ''}`);
 export const markAttendance = (eventId, studentId) => API.post(`/events/${eventId}/attendance`, { studentId });
-export const registerForEvent = (eventId, studentId) => API.post(`/events/${eventId}/register`, { studentId });
+export const registerForEvent = (eventId, studentId, utr) => API.post(`/events/${eventId}/register`, { studentId, utr });
 
 // Admin
 export const getAdminStats = () => API.get('/admin/stats');
@@ -34,6 +35,7 @@ export const getAdminStatDetails = (type, id) => API.get(`/admin/stats/details?t
 export const getUsers = (params) => API.get('/admin/users', { params });
 export const updateUserStatus = (id, status) => API.put(`/admin/users/${id}/status`, { status });
 export const deleteUser = (id) => API.delete(`/admin/users/${id}`);
+export const deleteEvent = (id) => API.delete(`/events/${id}`);
 
 // Feedback
 export const submitFeedback = (feedbackData) => API.post('/feedback', feedbackData);

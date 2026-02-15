@@ -103,6 +103,12 @@ function App() {
           </ProtectedRoute>
         } />
 
+        <Route path="/faculty/edit-event/:id" element={
+          <ProtectedRoute allowedRoles={['faculty']}>
+            <FacultyCreateEvent />
+          </ProtectedRoute>
+        } />
+
         <Route path="/faculty/manage-events" element={
           <ProtectedRoute allowedRoles={['faculty']}>
             <FacultyManageEvents />

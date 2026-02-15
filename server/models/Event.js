@@ -27,7 +27,8 @@ const eventSchema = new mongoose.Schema({
     registrations: [{
         studentId: String,
         registeredAt: { type: Date, default: Date.now },
-        status: { type: String, default: 'Confirmed' } // Confirmed, Cancelled
+        status: { type: String, default: 'Confirmed' }, // Confirmed, Cancelled
+        utr: { type: String } // Unique Transaction Reference for payments
     }]
 }, { timestamps: true });
 

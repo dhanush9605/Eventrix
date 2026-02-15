@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useEvents } from '../../context/EventContext';
 import {
@@ -16,8 +16,10 @@ import {
 
 const CreateEvent = () => {
     const navigate = useNavigate();
-    const { addEvent } = useEvents();
+    const { id } = useParams(); // Get ID from URL if editing
+    const { addEvent, updateEvent, getEventById } = useEvents(); // Assuming getEventById is available and synchronous enough or we fetch
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(!!id);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -38,6 +40,41 @@ const CreateEvent = () => {
     const [qrPreview, setQrPreview] = useState(null);
     const [bannerPreview, setBannerPreview] = useState(null);
 
+    // Fetch data if editing
+    React.useEffect(() => {
+        if (id) {
+            const event = getEventById(id);
+            if (event) {
+                setFormData({
+                    title: event.title,
+                    category: event.category,
+                    date: event.date,
+                    time: event.time,
+                    location: event.location,
+                    description: event.description,
+                    maxParticipants: event.maxParticipants,
+                    deadline: event.deadline,
+                    isPaid: event.isPaid,
+                    fee: event.fee || '',
+                    upiId: event.upiId || '',
+                    paymentQr: event.paymentQr, // Keep url
+                    bannerImage: event.bannerImage // Keep url
+                });
+                setBannerPreview(event.bannerImage);
+                setQrPreview(event.paymentQr);
+                setFetching(false);
+            } else {
+                // If not found in context (reloaded page), might need to fetch from API or redirect
+                // For simplicity, let's assume context has it or we redirect
+                // Ideally useEvents should have a fetchEventById async function
+                setFetching(false);
+            }
+        }
+    }, [id, getEventById]);
+
+    const [bannerFile, setBannerFile] = useState(null);
+    const [qrFile, setQrFile] = useState(null);
+
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -49,14 +86,20 @@ const CreateEvent = () => {
     const handleFileChange = (e, field) => {
         const file = e.target.files[0];
         if (file) {
+            // Store file for upload
+            if (field === 'paymentQr') {
+                setQrFile(file);
+            } else if (field === 'bannerImage') {
+                setBannerFile(file);
+            }
+
+            // Create preview
             const reader = new FileReader();
             reader.onloadend = () => {
                 if (field === 'paymentQr') {
                     setQrPreview(reader.result);
-                    setFormData(prev => ({ ...prev, paymentQr: reader.result }));
                 } else if (field === 'bannerImage') {
                     setBannerPreview(reader.result);
-                    setFormData(prev => ({ ...prev, bannerImage: reader.result }));
                 }
             };
             reader.readAsDataURL(file);
@@ -68,15 +111,42 @@ const CreateEvent = () => {
         setLoading(true);
 
         try {
-            const result = await addEvent(formData);
+            const data = new FormData();
+
+            // Append text fields
+            Object.keys(formData).forEach(key => {
+                // Don't append existing URLs as strings if we are sending files
+                // But we DO need to keep them if no new file is selected.
+                // However, our backend checks req.files. If not present, it leaves existing.
+                // So we just need to append text fields.
+                if (key !== 'bannerImage' && key !== 'paymentQr') {
+                    data.append(key, formData[key]);
+                }
+            });
+
+            // Append files ONLY if they are new File objects
+            if (bannerFile) {
+                data.append('bannerImage', bannerFile);
+            }
+            if (qrFile) {
+                data.append('paymentQr', qrFile);
+            }
+
+            let result;
+            if (id) {
+                result = await updateEvent(id, data);
+            } else {
+                result = await addEvent(data);
+            }
+
             if (result.success) {
                 navigate('/faculty/manage-events');
             } else {
-                alert(result.message || "Failed to create event");
+                alert(result.message || "Failed to save event");
             }
         } catch (error) {
-            console.error("Error creating event:", error);
-            alert("Something went wrong while creating the event.");
+            console.error("Error saving event:", error);
+            alert("Something went wrong while saving the event.");
         } finally {
             setLoading(false);
         }
@@ -131,12 +201,26 @@ const CreateEvent = () => {
         gap: '12px'
     };
 
+    if (fetching) {
+        return (
+            <DashboardLayout role="faculty" title={id ? "Edit Event" : "Create New Event"}>
+                <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '4rem' }}>
+                    <Loader2 className="animate-spin" size={32} />
+                </div>
+            </DashboardLayout>
+        );
+    }
+
     return (
-        <DashboardLayout role="faculty" title="Create New Event">
+        <DashboardLayout role="faculty" title={id ? "Edit Event" : "Create New Event"}>
             <div style={containerStyle}>
                 <div style={{ marginBottom: '2.5rem' }}>
-                    <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '0.5rem' }}>Launch Your Event</h2>
-                    <p style={{ color: '#666' }}>Fill in the details below to broadcast your event to students.</p>
+                    <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '0.5rem' }}>
+                        {id ? 'Edit Your Event' : 'Launch Your Event'}
+                    </h2>
+                    <p style={{ color: '#666' }}>
+                        {id ? 'Update the details of your event below.' : 'Fill in the details below to broadcast your event to students.'}
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -424,7 +508,7 @@ const CreateEvent = () => {
                             <Loader2 className="animate-spin" size={20} />
                         ) : (
                             <>
-                                Create Event <ChevronRight size={20} />
+                                {id ? 'Update Event' : 'Create Event'} <ChevronRight size={20} />
                             </>
                         )}
                     </button>

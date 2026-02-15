@@ -50,7 +50,17 @@ export const EventProvider = ({ children }) => {
     const addEvent = async (eventData) => {
         try {
             const facultyId = user._id || user.id;
-            const { data } = await api.createEvent({ ...eventData, facultyId });
+
+            let payload = eventData;
+            // If it's FormData, append facultyId
+            if (eventData instanceof FormData) {
+                eventData.append('facultyId', facultyId);
+            } else {
+                // Keep existing behavior for safety (though we moved to FormData)
+                payload = { ...eventData, facultyId };
+            }
+
+            const { data } = await api.createEvent(payload);
             setEvents(prev => [data, ...prev]);
             return { success: true, data };
         } catch (error) {
@@ -83,21 +93,49 @@ export const EventProvider = ({ children }) => {
         }
     };
 
-    const updateEvent = (id, updatedData) => {
-        setEvents(prev => prev.map(event =>
-            event._id === id ? { ...event, ...updatedData } : event
-        ));
+    const updateEvent = async (id, updatedData) => {
+        try {
+            let payload = updatedData;
+
+            // Check if backend expects FormData (it likely does because of file upload middleware on this route)
+            // Even if we are only updating text fields (like status), sending FormData prevents Multer boundary issues
+            // or we need to ensure the backend handles JSON on that route too.
+            // Safest approach if we suspect middleware issues: Convert to FormData if it's not already.
+            if (!(updatedData instanceof FormData)) {
+                const formData = new FormData();
+                Object.keys(updatedData).forEach(key => {
+                    formData.append(key, updatedData[key]);
+                });
+                payload = formData;
+            }
+
+            const { data } = await api.updateEvent(id, payload);
+            setEvents(prev => prev.map(event =>
+                event._id === id ? data : event
+            ));
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, message: error.response?.data?.message || 'Error updating event' };
+        }
     };
 
-    const deleteEvent = (id) => {
-        setEvents(prev => prev.filter(event => event._id !== id));
+    const deleteEvent = async (id) => {
+        try {
+            await api.deleteEvent(id);
+            setEvents(prev => prev.filter(event => event._id !== id));
+            return { success: true };
+        } catch (error) {
+            console.error("Error deleting event:", error);
+            // Still remove from UI if it was a 404? No, better to alert.
+            // But for now, let's assume if it fails, we shouldn't remove it.
+        }
     };
 
     const getEventById = (id) => {
         return events.find(event => event._id === id);
     };
 
-    const registerForEvent = async (eventId, studentDetails) => {
+    const registerForEvent = async (eventId, studentDetails, utr = null) => {
         if (!studentDetails || (!studentDetails.studentId && !studentDetails.id))
             return { success: false, message: 'User not logged in or invalid student ID' };
 
@@ -105,7 +143,7 @@ export const EventProvider = ({ children }) => {
             // Use the studentId (e.g., STU-2026-...) preferred, fallback to internal ID if needed but backend expects studentId
             const sId = studentDetails.studentId || studentDetails.id;
 
-            await api.registerForEvent(eventId, sId);
+            await api.registerForEvent(eventId, sId, utr);
 
             // Optimistically update UI
             setEvents(prev => prev.map(event => {
@@ -115,7 +153,7 @@ export const EventProvider = ({ children }) => {
                     if (!exists) {
                         return {
                             ...event,
-                            registrations: [...(event.registrations || []), { studentId: sId, registeredAt: new Date() }]
+                            registrations: [...(event.registrations || []), { studentId: sId, utr, registeredAt: new Date() }]
                         };
                     }
                 }

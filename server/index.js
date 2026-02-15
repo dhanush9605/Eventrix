@@ -11,6 +11,7 @@ import feedbackRoutes from './routes/feedback.js';
 import seedAdmin from './scripts/createAdmin.js';
 
 dotenv.config();
+// Trigger restart for env update
 
 const app = express();
 const PORT = process.env.PORT || 5001;

@@ -13,6 +13,7 @@ const StudentEvents = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [registering, setRegistering] = useState(false);
+    const [utr, setUtr] = useState('');
 
     // Filter only active events for students
     const activeEvents = events.filter(e => e.status === 'active');
@@ -31,6 +32,7 @@ const StudentEvents = () => {
 
         if (event.isPaid) {
             setSelectedEvent(event);
+            setUtr(''); // Reset UTR on open
             setShowPaymentModal(true);
         } else {
             handleRegistration(event._id);
@@ -38,8 +40,15 @@ const StudentEvents = () => {
     };
 
     const handleRegistration = async (eventId) => {
+        // Validate UTR for paid events
+        const event = events.find(e => e._id === eventId);
+        if (event?.isPaid && !utr.trim()) {
+            alert("Please enter the UTR / Transaction ID to confirm payment.");
+            return;
+        }
+
         setRegistering(true);
-        const result = await registerForEvent(eventId, user);
+        const result = await registerForEvent(eventId, user, utr);
         setRegistering(false);
         if (result.success) {
             alert("Successfully registered!");
@@ -227,24 +236,47 @@ const StudentEvents = () => {
                             </p>
                         </div>
 
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.85rem', color: '#ccc', marginBottom: '8px' }}>
+                                Enter UTR / Transaction ID <span style={{ color: '#d32f2f' }}>*</span>
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="e.g. 123456789012"
+                                value={utr}
+                                onChange={(e) => setUtr(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #333',
+                                    backgroundColor: '#050505',
+                                    color: '#fff',
+                                    fontSize: '0.95rem',
+                                    outline: 'none'
+                                }}
+                            />
+                        </div>
+
                         <button
                             onClick={() => handleRegistration(selectedEvent._id)}
                             disabled={registering}
                             style={{
                                 width: '100%',
                                 padding: '14px',
-                                backgroundColor: '#d32f2f',
-                                color: '#fff',
+                                backgroundColor: utr.trim() ? '#d32f2f' : '#333',
+                                color: utr.trim() ? '#fff' : '#888',
                                 border: 'none',
                                 borderRadius: '10px',
                                 fontWeight: 'bold',
                                 fontSize: '1rem',
-                                cursor: registering ? 'not-allowed' : 'pointer',
+                                cursor: registering || !utr.trim() ? 'not-allowed' : 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '10px',
-                                opacity: registering ? 0.7 : 1
+                                opacity: registering ? 0.7 : 1,
+                                transition: 'all 0.2s'
                             }}
                         >
                             {registering ? 'Processing...' : 'I Have Paid & Register'}
