@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 5001;
 app.use(helmet()); // Security Headers
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', process.env.CLIENT_URL],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
