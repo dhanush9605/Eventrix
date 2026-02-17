@@ -13,8 +13,8 @@ const StudentProfile = () => {
         { label: 'Full Name', value: user.name, icon: User },
         { label: 'Registration ID', value: user.studentId || 'N/A', icon: ShieldCheck },
         { label: 'Institutional Email', value: user.email, icon: Mail },
-        { label: 'Department', value: 'Computer Science & Engineering', icon: GraduationCap },
-        { label: 'Current Semester', value: 'Semester 6', icon: Calendar },
+        { label: 'Department', value: user.department || 'Not Assigned', icon: GraduationCap },
+        { label: 'Current Semester', value: user.year ? user.year.replace('S', 'Semester ') : 'N/A', icon: Calendar },
     ];
 
     return (

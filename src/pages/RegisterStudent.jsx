@@ -14,12 +14,13 @@ const RegisterStudent = () => {
         password: '',
         confirmPassword: '',
         department: 'Computer Science', // Default first option
-        year: '1'
+        year: 'S1'
     });
     const [error, setError] = useState('');
     const [showGoogleModal, setShowGoogleModal] = useState(false);
     const [googleData, setGoogleData] = useState(null);
     const [deptForGoogle, setDeptForGoogle] = useState('Computer Science');
+    const [semesterForGoogle, setSemesterForGoogle] = useState('S1');
 
     // Redirect if already logged in
     React.useEffect(() => {
@@ -58,7 +59,7 @@ const RegisterStudent = () => {
             ...googleData,
             role: 'student',
             department: deptForGoogle,
-            year: '1'
+            year: semesterForGoogle
         });
 
         if (res.success) {
@@ -264,18 +265,31 @@ const RegisterStudent = () => {
                                 <GraduationCap style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
                                 <select name="department" onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f9f9f9', appearance: 'none', color: '#666' }}>
                                     <option value="Computer Science">Computer Science</option>
+                                    <option value="Computer Science and Design">Computer Science and Design</option>
+                                    <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
                                     <option value="Information Technology">Information Technology</option>
                                     <option value="Electronics">Electronics</option>
+                                    <option value="Electrical">Electrical</option>
                                     <option value="Mechanical">Mechanical</option>
                                     <option value="Civil">Civil</option>
                                 </select>
                             </div>
                         </div>
                         <div>
-                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>Account Role</label>
+                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#444', textTransform: 'uppercase' }}>Semester</label>
                             <div style={{ position: 'relative' }}>
                                 <Briefcase style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
-                                <input disabled value="Student" style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f3f3f3', color: '#888' }} />
+                                <select name="year" onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f9f9f9', appearance: 'none', color: '#666' }}>
+                                    <option value="S1">S1</option>
+                                    <option value="S2">S2</option>
+                                    <option value="S3">S3</option>
+                                    <option value="S4">S4</option>
+                                    <option value="S5">S5</option>
+                                    <option value="S6">S6</option>
+                                    <option value="S7">S7</option>
+                                    <option value="S8">S8</option>
+                                </select>
+                                <ChevronRight style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', rotate: '90deg', color: '#aaa' }} size={16} />
                             </div>
                         </div>
                     </div>
@@ -375,10 +389,37 @@ const RegisterStudent = () => {
                                     required
                                 >
                                     <option value="Computer Science">Computer Science</option>
+                                    <option value="Computer Science and Design">Computer Science and Design</option>
+                                    <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
                                     <option value="Information Technology">Information Technology</option>
                                     <option value="Electronics">Electronics</option>
+                                    <option value="Electrical">Electrical</option>
                                     <option value="Mechanical">Mechanical</option>
                                     <option value="Civil">Civil</option>
+                                </select>
+                            </div>
+
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600' }}>Semester</label>
+                                <select
+                                    value={semesterForGoogle}
+                                    onChange={(e) => setSemesterForGoogle(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        borderRadius: '6px',
+                                        border: '1px solid #ddd'
+                                    }}
+                                    required
+                                >
+                                    <option value="S1">S1</option>
+                                    <option value="S2">S2</option>
+                                    <option value="S3">S3</option>
+                                    <option value="S4">S4</option>
+                                    <option value="S5">S5</option>
+                                    <option value="S6">S6</option>
+                                    <option value="S7">S7</option>
+                                    <option value="S8">S8</option>
                                 </select>
                             </div>
 

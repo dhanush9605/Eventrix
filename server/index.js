@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.js';
 import eventRoutes from './routes/events.js';
 import adminRoutes from './routes/admin.js';
 import feedbackRoutes from './routes/feedback.js';
+import departmentRoutes from './routes/departments.js';
 import seedAdmin from './scripts/createAdmin.js';
 
 dotenv.config();
@@ -54,6 +55,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/departments', departmentRoutes);
 
 app.get('/', (req, res) => {
     res.send('Eventrix Backend is running');

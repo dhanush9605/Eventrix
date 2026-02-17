@@ -37,6 +37,13 @@ export const updateUserStatus = (id, status) => API.put(`/admin/users/${id}/stat
 export const deleteUser = (id) => API.delete(`/admin/users/${id}`);
 export const deleteEvent = (id) => API.delete(`/events/${id}`);
 
+// Departments
+export const getDepartments = () => API.get('/departments');
+export const getDepartmentHierarchy = () => API.get('/departments/hierarchy');
+export const createDepartment = (deptData) => API.post('/departments', deptData);
+export const updateDepartment = (id, deptData) => API.put(`/departments/${id}`, deptData);
+export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
+
 // Feedback
 export const submitFeedback = (feedbackData) => API.post('/feedback', feedbackData);
 export const getEventFeedback = (eventId) => API.get(`/feedback/event/${eventId}`);

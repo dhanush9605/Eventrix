@@ -236,8 +236,14 @@ const RegisterFaculty = () => {
                             <LayoutGrid style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
                             <select name="department" onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f9f9f9', appearance: 'none', color: '#666' }}>
                                 <option value="Engineering">Engineering</option>
-                                <option value="Science">Science</option>
-                                <option value="Design">Design</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Computer Science and Design">Computer Science and Design</option>
+                                <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Civil">Civil</option>
                             </select>
                             <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
                         </div>
@@ -366,8 +372,14 @@ const RegisterFaculty = () => {
                                     required
                                 >
                                     <option value="Engineering">Engineering</option>
-                                    <option value="Science">Science</option>
-                                    <option value="Design">Design</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Computer Science and Design">Computer Science and Design</option>
+                                    <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="Civil">Civil</option>
                                 </select>
                             </div>
 
