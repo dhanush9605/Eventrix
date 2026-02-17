@@ -1,69 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { Download, FileText } from 'lucide-react';
-import { getAdminStats, getAdminStatDetails } from '../../services/api';
+import { getAdminStatDetails } from '../../services/api';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 
 const AdminReports = () => {
-    const navigate = useNavigate();
+
     const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState(null);
-    const [departmentData, setDepartmentData] = useState([]);
     const [engagementData, setEngagementData] = useState([]);
     const [eventData, setEventData] = useState([]);
-    const [usersData, setUsersData] = useState([]);
-    const [categoryData, setCategoryData] = useState([]);
-    const [monthlyEventsData, setMonthlyEventsData] = useState([]);
-    const [userRoleData, setUserRoleData] = useState([]);
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [statsRes, deptRes, engRes, eventRes, usersRes] = await Promise.all([
-                    getAdminStats(),
-                    getAdminStatDetails('departments'),
+                const [engRes, eventRes] = await Promise.all([
                     getAdminStatDetails('engagement'),
-                    getAdminStatDetails('events'),
-                    getAdminStatDetails('users')
+                    getAdminStatDetails('events')
                 ]);
-                setStats(statsRes.data);
-                setDepartmentData(deptRes.data);
+                // Removed unused data processing
+                // setStats(statsRes.data);
+                // setDepartmentData(deptRes.data);
                 setEngagementData(engRes.data);
                 setEventData(eventRes.data);
-                setUsersData(usersRes.data);
-
-                // Calculate Category Distribution
-                const categories = {};
-                const months = {};
-
-                eventRes.data.forEach(event => {
-                    // Categories
-                    const cat = event.category || 'Other';
-                    categories[cat] = (categories[cat] || 0) + 1;
-
-                    // Monthly Events
-                    const date = new Date(event.date);
-                    const monthKey = date.toLocaleString('default', { month: 'short' });
-                    months[monthKey] = (months[monthKey] || 0) + 1;
-                });
-
-                setCategoryData(Object.keys(categories).map(key => ({ name: key, value: categories[key] })));
-
-                // Sort months chronologically
-                const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const sortedMonths = Object.keys(months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
-
-                setMonthlyEventsData(sortedMonths.map(key => ({ name: key, events: months[key] })));
-
-                // Calculate User Roles
-                const roles = {};
-                usersRes.data.forEach(user => {
-                    const role = user.role || 'Unknown';
-                    roles[role] = (roles[role] || 0) + 1;
-                });
-                setUserRoleData(Object.keys(roles).map(key => ({ name: key, value: roles[key] })));
+                // setUsersData(usersRes.data);
 
             } catch (error) {
                 console.error('Error fetching reports:', error);
