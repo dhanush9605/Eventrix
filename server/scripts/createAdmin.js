@@ -23,24 +23,32 @@ const seedAdmin = async () => {
         let admin = await User.findOne({ email });
 
         if (!admin) {
-            admin = await User.create({
-                name: 'System Admin',
-                email,
-                password: hashedPassword,
-                role: 'admin',
-                department: 'Administration'
-            });
-            console.log('Admin user created successfully.');
-            console.log(`Email: ${email}`);
-            // Don't log password if it's from env var, security practice
-            if (password === 'admin123') {
-                console.log(`Password: ${password}`);
-            } else {
-                console.log('Password: [HIDDEN_FROM_LOGS]');
+            try {
+                admin = await User.create({
+                    name: 'System Admin',
+                    email,
+                    password: hashedPassword,
+                    role: 'admin',
+                    department: 'Administration'
+                });
+                console.log('Admin user created successfully.');
+                console.log(`Email: ${email}`);
+                // Don't log password if it's from env var, security practice
+                if (password === 'admin123') {
+                    console.log(`Password: ${password}`);
+                } else {
+                    console.log('Password: [HIDDEN_FROM_LOGS]');
+                }
+            } catch (createError) {
+                if (createError.code === 11000) {
+                    console.log(`User with email ${email} already exists. Skipping admin creation to prevent crash.`);
+                } else {
+                    console.error('Failed to create admin:', createError);
+                }
             }
         }
     } catch (error) {
-        console.error('Error seeding admin:', error);
+        console.error('Error in seedAdmin execution:', error);
     }
 };
 
