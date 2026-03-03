@@ -24,6 +24,7 @@ export const googleAuthComplete = (formData) => API.post('/auth/google/complete'
 export const createEvent = (eventData) => API.post('/events', eventData);
 export const updateEvent = (id, eventData) => API.put(`/events/${id}`, eventData);
 export const getEvents = (facultyId) => API.get(`/events?facultyId=${facultyId || ''}`);
+export const getEventDetails = (id) => API.get(`/events/${id}/details`);
 export const markAttendance = (eventId, studentId) => API.post(`/events/${eventId}/attendance`, { studentId });
 export const registerForEvent = (eventId, studentId, utr) => API.post(`/events/${eventId}/register`, { studentId, utr });
 

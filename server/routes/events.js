@@ -87,6 +87,37 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get Event Details with Populated Registrations
+router.get('/:id/details', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const event = await Event.findById(id).lean();
+
+        if (!event) return res.status(404).json({ message: 'Event not found' });
+
+        if (event.registrations && event.registrations.length > 0) {
+            const studentIds = event.registrations.map(r => r.studentId).filter(Boolean);
+            const students = await User.find({ studentId: { $in: studentIds } }, 'name email department year studentId').lean();
+
+            event.registrations = event.registrations.map(reg => {
+                const student = students.find(s => s.studentId === reg.studentId);
+                return {
+                    ...reg,
+                    studentName: student ? student.name : 'Unknown',
+                    studentEmail: student ? student.email : 'Unknown',
+                    department: student ? student.department : 'Unknown',
+                    year: student ? student.year : 'Unknown'
+                };
+            });
+        }
+
+        res.status(200).json(event);
+    } catch (error) {
+        console.error("Error fetching event details:", error);
+        res.status(500).json({ message: 'Error fetching event details' });
+    }
+});
+
 // Mark Attendance
 router.post('/:id/attendance', async (req, res) => {
     try {

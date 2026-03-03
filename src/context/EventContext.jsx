@@ -190,6 +190,16 @@ export const EventProvider = ({ children }) => {
         }
     };
 
+    const fetchEventDetails = async (eventId) => {
+        try {
+            const { data } = await api.getEventDetails(eventId);
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error fetching event details:', error);
+            return { success: false, message: error.response?.data?.message || 'Error fetching event details' };
+        }
+    };
+
     const getStudentRegistrations = React.useCallback((studentId) => {
         // Filter events where this student is registered
         return events.filter(event =>
@@ -220,6 +230,7 @@ export const EventProvider = ({ children }) => {
             markAttendance,
             submitRating,
             fetchEventFeedback,
+            fetchEventDetails,
             eventFeedbacks
         }}>
             {children}

@@ -13,9 +13,9 @@ const FacultyScanner = () => {
     useEffect(() => {
         let scanner = null;
 
-        function onScanSuccess(decodedText) {
+        async function onScanSuccess(decodedText) {
             // decodedText should be the studentId
-            const result = markAttendance(selectedEvent._id, decodedText);
+            const result = await markAttendance(selectedEvent._id, decodedText);
             setScanResult(result);
             setIsScanning(false); // Stop scanning after success/error to show result
         }
