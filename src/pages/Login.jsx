@@ -365,8 +365,11 @@ const Login = () => {
                                 >
                                     <option value="">Select Department</option>
                                     <option value="Computer Science">Computer Science</option>
+                                    <option value="Computer Science and Design">Computer Science and Design</option>
+                                    <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
                                     <option value="Information Technology">Information Technology</option>
                                     <option value="Electronics">Electronics</option>
+                                    <option value="Electrical">Electrical</option>
                                     <option value="Mechanical">Mechanical</option>
                                     <option value="Civil">Civil</option>
                                 </select>
