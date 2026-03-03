@@ -152,25 +152,35 @@ router.post('/google', async (req, res) => {
         const { credential, accessToken } = req.body;
         let email, name, picture, googleId;
 
-        if (credential) {
-            const ticket = await client.verifyIdToken({
-                idToken: credential,
-                audience: process.env.GOOGLE_CLIENT_ID,
-            });
-            const payload = ticket.getPayload();
-            email = payload.email;
-            name = payload.name;
-            picture = payload.picture;
-            googleId = payload.sub;
-        } else if (accessToken) {
-            const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            const payload = response.data;
-            email = payload.email;
-            name = payload.name;
-            picture = payload.picture;
-            googleId = payload.sub;
+        if (credential && typeof credential === 'string' && credential.length > 0) {
+            try {
+                const ticket = await client.verifyIdToken({
+                    idToken: credential,
+                    audience: process.env.GOOGLE_CLIENT_ID,
+                });
+                const payload = ticket.getPayload();
+                email = payload.email;
+                name = payload.name;
+                picture = payload.picture;
+                googleId = payload.sub;
+            } catch (verifyErr) {
+                console.error('verifyIdToken error:', verifyErr.message);
+                return res.status(400).json({ message: 'Invalid Google credential. Please try signing in again.' });
+            }
+        } else if (accessToken && typeof accessToken === 'string' && accessToken.length > 0) {
+            try {
+                const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const payload = response.data;
+                email = payload.email;
+                name = payload.name;
+                picture = payload.picture;
+                googleId = payload.sub;
+            } catch (googleApiErr) {
+                console.error('Google userinfo API error:', googleApiErr?.response?.data || googleApiErr.message);
+                return res.status(400).json({ message: 'Google token is invalid or expired. Please try signing in again.' });
+            }
         } else {
             return res.status(400).json({ message: 'No credential or accessToken provided' });
         }

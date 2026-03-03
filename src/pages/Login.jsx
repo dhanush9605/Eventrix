@@ -41,8 +41,15 @@ const Login = () => {
     };
 
     const loginWithGoogle = useGoogleLogin({
+        scope: 'openid email profile',
         onSuccess: async (tokenResponse) => {
-            const res = await googleAuth(null, tokenResponse.access_token);
+            console.log('Google tokenResponse:', tokenResponse);
+            const accessToken = tokenResponse?.access_token;
+            if (!accessToken) {
+                setError('Google sign-in did not return a token. Please try again.');
+                return;
+            }
+            const res = await googleAuth(null, accessToken);
             if (res.success) {
                 // Navigate logic handled by useEffect
             } else if (res.isNew) {
@@ -50,9 +57,10 @@ const Login = () => {
                 setShowGoogleModal(true);
             } else {
                 setError(res.message);
-            } // User selects role via tabs before clicking Google? Or we ask them?
+            }
         },
-        onError: () => {
+        onError: (err) => {
+            console.error('Google login error:', err);
             setError('Login Failed');
         }
     });
