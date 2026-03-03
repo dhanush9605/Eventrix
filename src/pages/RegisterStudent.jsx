@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, GraduationCap, ChevronRight, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterStudent = () => {
@@ -52,6 +52,23 @@ const RegisterStudent = () => {
             setError(res.message);
         }
     };
+
+    const loginWithGoogle = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            const res = await googleAuth(null, tokenResponse.access_token);
+            if (res.success) {
+                // Navigate logic handled by useEffect
+            } else if (res.isNew) {
+                setGoogleData(res.googleData);
+                setShowGoogleModal(true);
+            } else {
+                setError(res.message);
+            }
+        },
+        onError: () => {
+            setError('Registration Failed');
+        }
+    });
 
     const handleGoogleComplete = async (e) => {
         e.preventDefault();
@@ -313,22 +330,30 @@ const RegisterStudent = () => {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <GoogleLogin
-                        onSuccess={async (credentialResponse) => {
-                            const res = await googleAuth(credentialResponse.credential);
-                            if (res.success) {
-                                // Navigate logic handled by useEffect
-                            } else if (res.isNew) {
-                                setGoogleData(res.googleData);
-                                setShowGoogleModal(true);
-                            } else {
-                                setError(res.message);
-                            }
+                    <button
+                        type="button"
+                        onClick={() => loginWithGoogle()}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            width: '100%',
+                            padding: '0.75rem',
+                            backgroundColor: '#fff',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            color: '#444',
+                            cursor: 'pointer',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                            transition: 'all 0.2s ease'
                         }}
-                        onError={() => {
-                            setError('Registration Failed');
-                        }}
-                    />
+                    >
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px', height: '18px' }} />
+                        Sign in with Google
+                    </button>
                 </div>
 
                 <p style={{ fontSize: '0.85rem', marginTop: '1.5rem' }}>

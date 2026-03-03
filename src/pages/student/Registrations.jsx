@@ -47,47 +47,47 @@ const StudentRegistrations = () => {
                                 padding: '1.5rem',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'space-between'
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '1.5rem'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                                    {/* Event Image & Date Box */}
-                                    <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                                        <div style={{
-                                            width: '80px',
-                                            height: '80px',
-                                            borderRadius: '8px',
-                                            overflow: 'hidden',
-                                            flexShrink: 0,
-                                            backgroundColor: '#222' // Fallback bg
-                                        }}>
-                                            {event.bannerImage ? (
-                                                <img src={event.bannerImage} alt={event.title} referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            ) : (
-                                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.7rem' }}>No Img</div>
-                                            )}
-                                        </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: '1 1 250px', minWidth: 0 }}>
+                                    {/* Event Image */}
+                                    <div style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        borderRadius: '8px',
+                                        overflow: 'hidden',
+                                        flexShrink: 0,
+                                        backgroundColor: '#222'
+                                    }}>
+                                        {event.bannerImage ? (
+                                            <img src={event.bannerImage} alt={event.title} referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.7rem' }}>No Img</div>
+                                        )}
+                                    </div>
 
-                                        <div>
-                                            <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#fff' }}>{event.title}</h3>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888', fontSize: '0.85rem' }}>
-                                                    <Calendar size={14} /> <span>{event.date} • {event.time}</span>
-                                                </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888', fontSize: '0.85rem' }}>
-                                                    <MapPin size={14} /> <span>{event.location}</span>
-                                                </div>
+                                    <div style={{ minWidth: 0 }}>
+                                        <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{event.title}</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888', fontSize: '0.85rem' }}>
+                                                <Calendar size={14} /> <span style={{ whiteSpace: 'nowrap' }}>{event.date} • {event.time}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888', fontSize: '0.85rem' }}>
+                                                <MapPin size={14} /> <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{event.location}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
-                                    <div style={{ minWidth: '120px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+                                    <div>
                                         <span style={{ display: 'block', fontSize: '0.75rem', color: '#666', marginBottom: '4px' }}>Ticket Type</span>
                                         <span style={{ color: '#ccc', fontSize: '0.9rem' }}>{event.isPaid ? 'Paid Entry' : 'Standard Pass'}</span>
                                     </div>
 
-                                    <div style={{ minWidth: '100px' }}>
+                                    <div>
                                         <span style={{ display: 'block', fontSize: '0.75rem', color: '#666', marginBottom: '4px' }}>Status</span>
                                         <span style={{
                                             padding: '4px 10px',
@@ -96,13 +96,14 @@ const StudentRegistrations = () => {
                                             color: statusStyle.color,
                                             border: `1px solid ${statusStyle.border}40`,
                                             fontSize: '0.75rem',
-                                            fontWeight: '600'
+                                            fontWeight: '600',
+                                            whiteSpace: 'nowrap'
                                         }}>
                                             {reg.status}
                                         </span>
                                     </div>
 
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                                         <button
                                             onClick={() => {
                                                 setSelectedTicket(event);
@@ -119,7 +120,8 @@ const StudentRegistrations = () => {
                                                 borderRadius: '6px',
                                                 fontWeight: '600',
                                                 fontSize: '0.85rem',
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                whiteSpace: 'nowrap'
                                             }}>
                                             <QrCode size={16} /> View Ticket
                                         </button>
@@ -139,7 +141,8 @@ const StudentRegistrations = () => {
                                                     borderRadius: '6px',
                                                     fontWeight: '600',
                                                     fontSize: '0.85rem',
-                                                    cursor: 'pointer'
+                                                    cursor: 'pointer',
+                                                    whiteSpace: 'nowrap'
                                                 }}>
                                                 <Star size={16} fill="#ffc107" /> Rate Event
                                             </button>

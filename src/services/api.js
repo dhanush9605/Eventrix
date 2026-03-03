@@ -17,7 +17,7 @@ API.interceptors.request.use((req) => {
 
 export const login = (formData) => API.post('/auth/login', formData);
 export const register = (formData) => API.post('/auth/register', formData);
-export const googleAuth = (credential) => API.post('/auth/google', { credential });
+export const googleAuth = (credential, accessToken) => API.post('/auth/google', { credential, accessToken });
 export const googleAuthComplete = (formData) => API.post('/auth/google/complete', formData);
 
 // Events

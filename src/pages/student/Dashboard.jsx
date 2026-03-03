@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useEvents } from '../../context/EventContext';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
@@ -8,6 +9,7 @@ import StudentQRPass from '../../components/StudentQRPass';
 const StudentDashboard = () => {
     const { events, getStudentRegistrations } = useEvents();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [showID, setShowID] = useState(false);
 
@@ -31,9 +33,9 @@ const StudentDashboard = () => {
         : 0;
 
     const metrics = [
-        { label: 'Registered Events', value: registrations.length.toString(), subtext: 'Total registrations', icon: Calendar, color: '#d32f2f' },
-        { label: 'Attended Events', value: attendedCount.toString(), subtext: `Attendance Rate: ${attendanceRate}%`, icon: PlayCircle, color: '#fff' },
-        { label: 'Certificates', value: certificatesCount.toString(), subtext: `${certificatesCount} earned`, icon: Award, color: '#fff' }
+        { label: 'Registered Events', value: registrations.length.toString(), subtext: 'Total registrations', icon: Calendar, color: '#d32f2f', path: '/student/registrations' },
+        { label: 'Attended Events', value: attendedCount.toString(), subtext: `Attendance Rate: ${attendanceRate}%`, icon: PlayCircle, color: '#fff', path: '/student/registrations' },
+        { label: 'Certificates', value: certificatesCount.toString(), subtext: `${certificatesCount} earned`, icon: Award, color: '#fff', path: '/student/certificates' }
     ];
 
     const handleJoinSession = (eventName) => {
@@ -67,6 +69,7 @@ const StudentDashboard = () => {
                             e.currentTarget.style.transform = 'translateY(0)';
                             e.currentTarget.style.borderColor = '#1a1a1a';
                         }}
+                        onClick={() => m.path && navigate(m.path)}
                     >
                         <span style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '1.5rem' }}>{m.label}</span>
                         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>

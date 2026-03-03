@@ -78,14 +78,13 @@ const AdminUserManagement = () => {
         <DashboardLayout role="admin" title="User Management">
 
             <div style={{ marginBottom: '3rem' }}>
-                <p style={{ color: '#666', fontSize: '0.9rem', maxWidth: '600px' }}>
-                    Manage system users, adjust roles, and monitor account statuses across all departments.
-                </p>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '-2rem', justifyContent: 'flex-end' }}>
-                    <button style={{ backgroundColor: '#111', border: '1px solid #222', color: '#fff', padding: '10px 20px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+                    <p style={{ color: '#666', fontSize: '0.9rem', maxWidth: '600px', margin: 0 }}>
+                        Manage system users, adjust roles, and monitor account statuses across all departments.
+                    </p>
+                    <button style={{ backgroundColor: '#111', border: '1px solid #222', color: '#fff', padding: '10px 20px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', flexShrink: 0 }}>
                         <Download size={16} /> Export CSV
                     </button>
-                    {/* Add User Modal Logic can be re-added here if needed later, currently focusing on listing/managing existing */}
                 </div>
             </div>
 
@@ -156,8 +155,8 @@ const AdminUserManagement = () => {
             </div>
 
             {/* User Table */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px 12px 0 0', overflow: 'hidden', overflowX: 'auto' }}>
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead style={{ backgroundColor: '#fff', borderBottom: '1px solid #f0f0f0' }}>
                         <tr style={{ color: '#888', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             <th style={{ padding: '1.5rem 2rem' }}>User Details</th>
@@ -255,7 +254,7 @@ const AdminUserManagement = () => {
             </div>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', marginTop: '3rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
                 {statCards.map((s, i) => (
                     <div key={i} style={{ backgroundColor: '#0a0a0a', border: '1px solid #111', borderRadius: '16px', padding: '2rem', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                         <div style={{ width: '50px', height: '50px', backgroundColor: s.bg, color: s.color, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

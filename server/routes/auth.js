@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { body, validationResult } from 'express-validator';
+import axios from 'axios';
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -148,13 +149,31 @@ router.post('/login', [
 // Google Auth Init
 router.post('/google', async (req, res) => {
     try {
-        const { credential } = req.body;
-        const ticket = await client.verifyIdToken({
-            idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
-        const payload = ticket.getPayload();
-        const { email, name, picture, sub: googleId } = payload;
+        const { credential, accessToken } = req.body;
+        let email, name, picture, googleId;
+
+        if (credential) {
+            const ticket = await client.verifyIdToken({
+                idToken: credential,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            });
+            const payload = ticket.getPayload();
+            email = payload.email;
+            name = payload.name;
+            picture = payload.picture;
+            googleId = payload.sub;
+        } else if (accessToken) {
+            const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            const payload = response.data;
+            email = payload.email;
+            name = payload.name;
+            picture = payload.picture;
+            googleId = payload.sub;
+        } else {
+            return res.status(400).json({ message: 'No credential or accessToken provided' });
+        }
 
         const existingUser = await User.findOne({ email });
 

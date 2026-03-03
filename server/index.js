@@ -18,7 +18,9 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(helmet()); // Security Headers
+app.use(helmet({
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
+})); // Security Headers
 app.use(express.json());
 app.use(cors({
     origin: ['http://localhost:5173', 'http://127.0.0.1:5173', process.env.CLIENT_URL],

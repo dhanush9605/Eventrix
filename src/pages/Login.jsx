@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Lock, Eye, EyeOff, GraduationCap, User, ShieldCheck, X } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -40,6 +40,23 @@ const Login = () => {
         }
     };
 
+    const loginWithGoogle = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            const res = await googleAuth(null, tokenResponse.access_token);
+            if (res.success) {
+                // Navigate logic handled by useEffect
+            } else if (res.isNew) {
+                setGoogleData(res.googleData);
+                setShowGoogleModal(true);
+            } else {
+                setError(res.message);
+            } // User selects role via tabs before clicking Google? Or we ask them?
+        },
+        onError: () => {
+            setError('Login Failed');
+        }
+    });
+
     const handleGoogleComplete = async (e) => {
         e.preventDefault();
         if (!department) {
@@ -49,13 +66,9 @@ const Login = () => {
 
         const res = await googleAuthComplete({
             ...googleData,
-            role: activeRole, // User selects role via tabs before clicking Google? Or we ask them?
-            // Requirement says: "ask the student which department on the same question in the sign in google option"
-            // And I asked "Assume they are a Student by default? or Show a popup?". User didn't explicitly answer but approved plan which said "Popup... select Department".
-            // I will implement the Popup to select Department. 
-            // I will also include Role selection in the popup just to be safe/flexible, defaulting to the active tab.
+            role: activeRole,
             department,
-            year: '1' // Default year for now? Or ask? For simplicity, default to 1 or add field.
+            year: '1'
         });
 
         if (res.success) {
@@ -287,22 +300,30 @@ const Login = () => {
                         </div>
 
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <GoogleLogin
-                                onSuccess={async (credentialResponse) => {
-                                    const res = await googleAuth(credentialResponse.credential);
-                                    if (res.success) {
-                                        // Navigate logic handled by useEffect
-                                    } else if (res.isNew) {
-                                        setGoogleData(res.googleData);
-                                        setShowGoogleModal(true);
-                                    } else {
-                                        setError(res.message);
-                                    }
+                            <button
+                                type="button"
+                                onClick={() => loginWithGoogle()}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '10px',
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    backgroundColor: '#fff',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '6px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '600',
+                                    color: '#444',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                                    transition: 'all 0.2s ease'
                                 }}
-                                onError={() => {
-                                    setError('Login Failed');
-                                }}
-                            />
+                            >
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px', height: '18px' }} />
+                                Sign in with Google
+                            </button>
                         </div>
                     </>
                 )}

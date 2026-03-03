@@ -95,7 +95,7 @@ const StudentEvents = () => {
             </div>
 
             {/* Events Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                 {filteredEvents.map(event => (
                     <div key={event._id} style={{
                         backgroundColor: '#0a0505',

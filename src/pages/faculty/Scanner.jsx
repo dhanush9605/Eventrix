@@ -10,7 +10,8 @@ const FacultyScanner = () => {
     const [detailedEvent, setDetailedEvent] = useState(null);
     const [scanResult, setScanResult] = useState(null); // { success: boolean, message: string, studentName?: string }
     const [isScanning, setIsScanning] = useState(false);
-    const isProcessingRef = React.useRef(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const isProcessingRef = React.useRef(false); // keep ref for immediate sync check
 
     useEffect(() => {
         if (selectedEvent) {
@@ -31,18 +32,25 @@ const FacultyScanner = () => {
         let scanner = null;
 
         async function onScanSuccess(decodedText) {
+            // Prevent duplicate triggers in the exact same millisecond
             if (isProcessingRef.current) return;
             isProcessingRef.current = true;
 
-            // decodedText should be the studentId
-            const result = await markAttendance(selectedEvent._id, decodedText);
-            setScanResult(result);
-            setIsScanning(false); // Stop scanning after success/error to show result
-            if (result.success) {
-                loadEventDetails(); // Refresh the populated list
-            }
+            // Instantly unmount the scanner from the DOM to physically prevent another read
+            setIsScanning(false);
+            setIsProcessing(true);
 
-            isProcessingRef.current = false;
+            try {
+                // decodedText should be the studentId
+                const result = await markAttendance(selectedEvent._id, decodedText);
+                setScanResult(result);
+                if (result.success) {
+                    await loadEventDetails(); // Refresh the populated list
+                }
+            } finally {
+                setIsProcessing(false);
+                isProcessingRef.current = false;
+            }
         }
 
         function onScanFailure() {
@@ -50,7 +58,7 @@ const FacultyScanner = () => {
             // but we could log it or show a subtle indicator
         }
 
-        if (isScanning && selectedEvent) {
+        if (isScanning && selectedEvent && !isProcessing) {
             scanner = new Html5QrcodeScanner(
                 "reader",
                 { fps: 10, qrbox: { width: 250, height: 250 } },
@@ -67,10 +75,12 @@ const FacultyScanner = () => {
                 });
             }
         };
-    }, [isScanning, selectedEvent, markAttendance]);
+    }, [isScanning, isProcessing, selectedEvent, markAttendance]);
 
     const resetScanner = () => {
         setScanResult(null);
+        setIsProcessing(false);
+        isProcessingRef.current = false;
         setIsScanning(true);
     };
 

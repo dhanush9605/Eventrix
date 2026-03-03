@@ -32,9 +32,9 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const googleAuth = async (credential) => {
+    const googleAuth = async (credential, accessToken) => {
         try {
-            const { data } = await api.googleAuth(credential);
+            const { data } = await api.googleAuth(credential, accessToken);
             if (data?.result) {
                 // User exists, log them in
                 setUser(data.result);

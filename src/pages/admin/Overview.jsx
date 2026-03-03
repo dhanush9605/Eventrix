@@ -147,7 +147,7 @@ const AdminOverview = () => {
     return (
         <DashboardLayout role="admin" title="System Overview">
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
                 {statCards.map((s, i) => (
                     <div
                         key={i}
@@ -168,9 +168,9 @@ const AdminOverview = () => {
                             </div>
                         </div>
                         <span style={{ fontSize: '2rem', fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>{s.value}</span>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#666' }}>{s.label}</span>
-                            <span style={{ fontSize: '0.65rem', color: s.color }}>{s.change}</span>
+                            <span style={{ fontSize: '0.7rem', color: s.color }}>{s.change}</span>
                         </div>
                     </div>
                 ))}
