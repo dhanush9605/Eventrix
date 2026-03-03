@@ -5,19 +5,44 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import { Camera, CheckCircle, XCircle, Search, AlertCircle, RefreshCw } from 'lucide-react';
 
 const FacultyScanner = () => {
-    const { events, markAttendance } = useEvents();
+    const { events, markAttendance, fetchEventDetails } = useEvents();
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [detailedEvent, setDetailedEvent] = useState(null);
     const [scanResult, setScanResult] = useState(null); // { success: boolean, message: string, studentName?: string }
     const [isScanning, setIsScanning] = useState(false);
+    const isProcessingRef = React.useRef(false);
+
+    useEffect(() => {
+        if (selectedEvent) {
+            loadEventDetails();
+        } else {
+            setDetailedEvent(null);
+        }
+    }, [selectedEvent]);
+
+    const loadEventDetails = async () => {
+        const result = await fetchEventDetails(selectedEvent._id);
+        if (result.success) {
+            setDetailedEvent(result.data);
+        }
+    };
 
     useEffect(() => {
         let scanner = null;
 
         async function onScanSuccess(decodedText) {
+            if (isProcessingRef.current) return;
+            isProcessingRef.current = true;
+
             // decodedText should be the studentId
             const result = await markAttendance(selectedEvent._id, decodedText);
             setScanResult(result);
             setIsScanning(false); // Stop scanning after success/error to show result
+            if (result.success) {
+                loadEventDetails(); // Refresh the populated list
+            }
+
+            isProcessingRef.current = false;
         }
 
         function onScanFailure() {
@@ -212,6 +237,35 @@ const FacultyScanner = () => {
                                     <p style={{ fontSize: '0.75rem', color: '#666', lineHeight: '1.4' }}>
                                         Position the student's profile QR code clearly in the square to mark attendance.
                                     </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Attendance List */}
+                        {detailedEvent && detailedEvent.attendance && detailedEvent.attendance.length > 0 && (
+                            <div style={{ marginTop: '2rem', textAlign: 'left', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '16px', padding: '1.5rem', animation: 'fadeIn 0.3s ease' }}>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
+                                    <CheckCircle size={18} color="#4caf50" /> Successfully Marked ({detailedEvent.attendance.length})
+                                </h3>
+                                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                                        <thead>
+                                            <tr style={{ color: '#666', borderBottom: '1px solid #222', textAlign: 'left' }}>
+                                                <th style={{ padding: '10px 8px' }}>Name</th>
+                                                <th style={{ padding: '10px 8px' }}>Student ID</th>
+                                                <th style={{ padding: '10px 8px', textAlign: 'right' }}>Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {[...detailedEvent.attendance].sort((a, b) => new Date(b.markedAt) - new Date(a.markedAt)).map((att, idx) => (
+                                                <tr key={idx} style={{ borderBottom: '1px solid #1a1a1a' }}>
+                                                    <td style={{ padding: '10px 8px', color: '#fff' }}>{att.studentName || 'Unknown'}</td>
+                                                    <td style={{ padding: '10px 8px', color: '#888' }}>{att.studentId}</td>
+                                                    <td style={{ padding: '10px 8px', color: '#888', textAlign: 'right' }}>{new Date(att.markedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         )}
