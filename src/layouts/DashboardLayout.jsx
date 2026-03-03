@@ -88,7 +88,7 @@ const DashboardLayout = ({ children, role, title, showTopBar = true }) => {
                             >
                                 {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
                             </button>
-                            <h1 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.5rem)', fontWeight: '700' }}>{title}</h1>
+                            <div role="heading" aria-level={1} style={{ fontSize: 'clamp(1.25rem, 5vw, 1.5rem)', fontWeight: '700', margin: 0, lineHeight: 1.2 }}>{title}</div>
                             {role === 'faculty' && <span className="hide-mobile" style={{ backgroundColor: '#d32f2f15', color: '#d32f2f', padding: '4px 12px', borderRadius: '100px', fontSize: '0.6rem', fontWeight: '800', textTransform: 'uppercase' }}>● Live View</span>}
                         </div>
 

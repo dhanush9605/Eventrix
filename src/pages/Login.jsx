@@ -115,24 +115,10 @@ const Login = () => {
                 textDecoration: 'none',
                 color: 'white'
             }}>
-                <div style={{ width: '24px', height: '24px', backgroundColor: '#d32f2f', borderRadius: '3px' }}></div>
-                <span style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', fontWeight: 'bold' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
+                <img src="/logo.svg" alt="Eventrix Logo" style={{ width: '28px', height: 'auto' }} />
             </Link>
 
-            <button className="hide-mobile" style={{
-                position: 'absolute',
-                top: 'clamp(1rem, 3vw, 2rem)',
-                right: 'clamp(1rem, 3vw, 2rem)',
-                backgroundColor: '#111',
-                border: '1px solid #222',
-                color: 'white',
-                padding: '8px 20px',
-                borderRadius: '4px',
-                fontSize: '0.8rem',
-                cursor: 'pointer'
-            }}>
-                Help
-            </button>
+
 
             {/* Login Card */}
             <div style={{

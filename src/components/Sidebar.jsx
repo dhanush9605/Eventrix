@@ -60,9 +60,8 @@ const Sidebar = ({ role }) => {
         }}>
             {/* Sidebar Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3rem', paddingLeft: '0.5rem', flexShrink: 0 }}>
-                <div style={{ width: '38px', height: '38px', backgroundColor: '#d32f2f', borderRadius: '8px', boxShadow: '0 0 15px rgba(211, 47, 47, 0.4)' }}></div>
+                <img src="/logo.svg" alt="Eventrix Logo" style={{ width: '42px', height: 'auto' }} />
                 <div>
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', display: 'block', lineHeight: 1, letterSpacing: '-0.5px' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
                     <span style={{ fontSize: '0.65rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: '600', display: 'block', marginTop: '4px' }}>
                         {role.toUpperCase()} PORTAL
                     </span>

@@ -13,8 +13,8 @@ const RoleBasedUtility = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                     {/* Students */}
-                    <div style={{ backgroundColor: '#050505', padding: '4rem 2rem', borderRadius: '4px', position: 'relative', border: '1px solid #111' }}>
-                        <div style={{
+                    <div className="feature-card" style={{ backgroundColor: '#050505', padding: '4rem 2rem', borderRadius: '4px', position: 'relative', border: '1px solid #111' }}>
+                        <div className="icon-container" style={{
                             width: '60px',
                             height: '60px',
                             backgroundColor: '#d32f2f15',
@@ -31,13 +31,13 @@ const RoleBasedUtility = () => {
                         <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
                             Access a central hub for all registrations. Get digital entry tickets, set up personalized event calendars, and receive instant campus notifications.
                         </p>
-                        <Link to="/register/student" style={{ color: '#d32f2f', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '2rem' }}>Learn More</Link>
+                        <Link to="/register/student" className="learn-more" style={{ color: '#d32f2f', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '2rem' }}>Learn More</Link>
                         <div style={{ width: '40px', height: '3px', backgroundColor: '#d32f2f', margin: '0 auto' }}></div>
                     </div>
 
                     {/* Faculty */}
-                    <div style={{ backgroundColor: '#050505', padding: '4rem 2rem', borderRadius: '4px', position: 'relative', border: '1px solid #111' }}>
-                        <div style={{
+                    <div className="feature-card" style={{ backgroundColor: '#050505', padding: '4rem 2rem', borderRadius: '4px', position: 'relative', border: '1px solid #111' }}>
+                        <div className="icon-container" style={{
                             width: '60px',
                             height: '60px',
                             backgroundColor: '#d32f2f15',
@@ -54,13 +54,13 @@ const RoleBasedUtility = () => {
                         <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
                             Seamlessly manage budgets, automate approval workflows for event proposals, and reserve prime venues across campus with a click.
                         </p>
-                        <Link to="/register/faculty" style={{ color: '#d32f2f', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '2rem' }}>Learn More</Link>
-                        <div style={{ width: '40px', height: '3px', backgroundColor: '#333', margin: '0 auto' }}></div>
+                        <Link to="/register/faculty" className="learn-more" style={{ color: '#d32f2f', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '2rem' }}>Learn More</Link>
+                        <div style={{ width: '40px', height: '3px', backgroundColor: '#d32f2f', margin: '0 auto' }}></div>
                     </div>
 
                     {/* Admin */}
-                    <div style={{ backgroundColor: '#050505', padding: '4rem 2rem', borderRadius: '4px', position: 'relative', border: '1px solid #111' }}>
-                        <div style={{
+                    <div className="feature-card" style={{ backgroundColor: '#050505', padding: '4rem 2rem', borderRadius: '4px', position: 'relative', border: '1px solid #111' }}>
+                        <div className="icon-container" style={{
                             width: '60px',
                             height: '60px',
                             backgroundColor: '#d32f2f15',
@@ -77,7 +77,7 @@ const RoleBasedUtility = () => {
                         <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
                             Gain bird's-eye view through real-time analytics. Manage system-wide security, user permissions, and institutional reporting tools.
                         </p>
-                        <Link to="/login" style={{ color: '#d32f2f', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '2rem' }}>Learn More</Link>
+                        <Link to="/login" className="learn-more" style={{ color: '#d32f2f', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '2rem' }}>Learn More</Link>
                         <div style={{ width: '40px', height: '3px', backgroundColor: '#d32f2f', margin: '0 auto' }}></div>
                     </div>
                 </div>

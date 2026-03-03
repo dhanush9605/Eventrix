@@ -267,8 +267,118 @@ section {
   }
 }
 
+/* Professional Logo Animations */
+@keyframes letterTracking {
+  0% {
+    letter-spacing: -0.5em;
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  40% {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  100% {
+    letter-spacing: -0.04em;
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes xReveal {
+  0% {
+    transform: translateY(20px) scale(0.8);
+    opacity: 0;
+    text-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    transform: translateY(-5px) scale(1.1);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateY(2px) scale(1.2);
+    opacity: 1;
+    text-shadow: 0 0 25px rgba(211, 47, 47, 0.6);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes xHeartbeat {
+  0% {
+    transform: translateY(2px) scale(1.2);
+    text-shadow: 0 0 25px rgba(211, 47, 47, 0.6);
+  }
+
+  6% {
+    transform: translateY(2px) scale(1.35);
+    text-shadow: 0 0 45px rgba(211, 47, 47, 0.9);
+  }
+
+  12% {
+    transform: translateY(2px) scale(1.2);
+    text-shadow: 0 0 25px rgba(211, 47, 47, 0.6);
+  }
+
+  18% {
+    transform: translateY(2px) scale(1.35);
+    text-shadow: 0 0 45px rgba(211, 47, 47, 0.9);
+  }
+
+  24%,
+  100% {
+    transform: translateY(2px) scale(1.2);
+    text-shadow: 0 0 25px rgba(211, 47, 47, 0.6);
+  }
+}
+
+.animate-pro-logo {
+  animation: letterTracking 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  display: inline-block;
+  opacity: 0;
+}
+
+.animate-pro-x {
+  opacity: 0;
+  display: inline-block;
+  transform: translateY(20px) scale(0.8);
+  animation:
+    xReveal 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.2s forwards,
+    xHeartbeat 2.5s ease-in-out 3s infinite forwards;
+}
+
+/* Feature Card Animation */
+.feature-card {
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(211, 47, 47, 0.4) !important;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(211, 47, 47, 0.1);
+}
+
+.feature-card .icon-container {
+  transition: all 0.4s ease;
+}
+
+.feature-card:hover .icon-container {
+  background-color: rgba(211, 47, 47, 0.2) !important;
+  transform: scale(1.1);
+}
+
+.feature-card .learn-more {
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .learn-more {
+  letter-spacing: 0.15em !important;
 }
 
 .animate-fade-scale {

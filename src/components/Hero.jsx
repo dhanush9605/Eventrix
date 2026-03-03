@@ -38,14 +38,16 @@ const Hero = () => {
                 </div>
 
                 {/* Heading */}
-                <h1 style={{
-                    fontSize: 'clamp(3rem, 12vw, 8rem)',
-                    lineHeight: '0.9',
-                    marginBottom: '1.5rem',
-                    letterSpacing: '-0.04em'
-                }}>
-                    EVENTRI<span style={{ color: '#d32f2f' }}>X</span>
-                </h1>
+                <div>
+                    <h1 className="animate-pro-logo" style={{
+                        fontSize: 'clamp(3rem, 12vw, 8rem)',
+                        lineHeight: '0.9',
+                        marginBottom: '1.5rem',
+                        letterSpacing: '-0.04em'
+                    }}>
+                        EVENTRI<span className="animate-pro-x" style={{ color: '#d32f2f', fontSize: '1.2em' }}>X</span>
+                    </h1>
+                </div>
 
                 {/* Subtext */}
                 <p style={{

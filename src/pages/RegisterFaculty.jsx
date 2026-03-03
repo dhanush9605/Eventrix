@@ -105,21 +105,10 @@ const RegisterFaculty = () => {
                 color: 'white',
                 zIndex: 10
             }}>
-                <div style={{ width: '24px', height: '24px', backgroundColor: '#d32f2f', borderRadius: '3px' }}></div>
-                <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Eventri<span style={{ color: '#d32f2f' }}>X</span></span>
+                <img src="/logo.svg" alt="Eventrix Logo" style={{ width: '28px', height: 'auto' }} />
             </Link>
 
-            <span style={{
-                position: 'absolute',
-                top: '2.5rem',
-                right: '2rem',
-                color: '#666',
-                fontSize: '0.8rem',
-                zIndex: 10,
-                cursor: 'pointer'
-            }}>
-                Institutional Help
-            </span>
+
 
             {/* Register Card */}
             <div style={{
