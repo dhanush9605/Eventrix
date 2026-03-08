@@ -4,7 +4,8 @@ const settingsSchema = new mongoose.Schema({
     maintenanceMode: { type: Boolean, default: false },
     studentRegistration: { type: Boolean, default: true },
     facultyRegistration: { type: Boolean, default: true },
-    publicLeaderboards: { type: Boolean, default: true }
+    publicLeaderboards: { type: Boolean, default: true },
+    maintenancePassword: { type: String, default: 'maintain@888999' }
 }, { timestamps: true });
 
 // We only need one document for global settings

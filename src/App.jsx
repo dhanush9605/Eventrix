@@ -36,7 +36,8 @@ function AppContent() {
     const checkMaintenance = async () => {
       try {
         const { data } = await api.getSettings();
-        if (data.maintenanceMode && user?.role !== 'admin') {
+        const hasBypass = localStorage.getItem('maintenance_password') === data.maintenancePassword;
+        if (data.maintenanceMode && user?.role !== 'admin' && !hasBypass) {
           setIsMaintenance(true);
         } else {
           setIsMaintenance(false);

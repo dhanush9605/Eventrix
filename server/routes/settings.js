@@ -24,7 +24,9 @@ router.get('/', async (req, res) => {
                     maintenanceMode: false,
                     studentRegistration: true,
                     facultyRegistration: true,
-                    publicLeaderboards: true
+                    facultyRegistration: true,
+                    publicLeaderboards: true,
+                    maintenancePassword: 'maintain@888999'
                 }
             },
             {
@@ -59,6 +61,7 @@ router.put('/', auth, isAdmin, async (req, res) => {
         if (studentRegistration !== undefined) settings.studentRegistration = studentRegistration;
         if (facultyRegistration !== undefined) settings.facultyRegistration = facultyRegistration;
         if (publicLeaderboards !== undefined) settings.publicLeaderboards = publicLeaderboards;
+        if (req.body.maintenancePassword !== undefined) settings.maintenancePassword = req.body.maintenancePassword;
 
         await settings.save();
 

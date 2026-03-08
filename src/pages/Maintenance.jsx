@@ -68,7 +68,7 @@ const Maintenance = () => {
                     <div style={{ textAlign: 'center' }}>
                         <Mail size={20} color="#d32f2f" style={{ marginBottom: '8px' }} />
                         <p style={{ fontSize: '0.8rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Support</p>
-                        <p style={{ fontWeight: 'bold' }}>admin@eventrix.edu</p>
+                        <p style={{ fontWeight: 'bold' }}>eventrixhq@gmail.com</p>
                     </div>
                 </div>
 

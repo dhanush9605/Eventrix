@@ -30,6 +30,13 @@ const maintenance = async (req, res, next) => {
                 }
             }
 
+            // 3. Allow bypass for users with maintenance password
+            const maintenancePass = req.headers['x-maintenance-password'];
+            if (maintenancePass && maintenancePass === settings.maintenancePassword) {
+                console.log(`[Maintenance] Bypassing for user with correct maintenance password`);
+                return next();
+            }
+
             console.log(`[Maintenance] Blocking access to: ${req.path}`);
             return res.status(503).json({
                 message: 'System is currently under maintenance. Please try again later.',

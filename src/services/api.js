@@ -6,11 +6,15 @@ const getBaseURL = () => {
 };
 
 const API = axios.create({ baseURL: getBaseURL() });
-
 API.interceptors.request.use((req) => {
     if (localStorage.getItem('eventrix_user')) {
         const user = JSON.parse(localStorage.getItem('eventrix_user'));
         req.headers.Authorization = `Bearer ${user.token}`;
+    }
+
+    const maintPass = localStorage.getItem('maintenance_password');
+    if (maintPass) {
+        req.headers['x-maintenance-password'] = maintPass;
     }
     return req;
 });

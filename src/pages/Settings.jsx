@@ -21,7 +21,8 @@ const Settings = () => {
         maintenanceMode: false,
         studentRegistration: true,
         facultyRegistration: true,
-        publicLeaderboards: true
+        publicLeaderboards: true,
+        maintenancePassword: ''
     });
 
     const [loading, setLoading] = useState(false);
@@ -82,40 +83,117 @@ const Settings = () => {
         }
     };
 
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showConfirm, setShowConfirm] = useState(false);
+
     const handleSystemToggle = (key) => {
-        setSystemSettings(prev => ({ ...prev, [key]: !prev[key] }));
+        if (key === 'maintenanceMode') {
+            setShowConfirm(true);
+        } else {
+            setSystemSettings(prev => ({ ...prev, [key]: !prev[key] }));
+        }
     };
 
-    const Toggle = ({ active, onToggle, label, description }) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 0' }}>
-            <div>
-                <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>{label}</h4>
-                <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: 0 }}>{description}</p>
+    const confirmToggle = () => {
+        if (confirmPassword === systemSettings.maintenancePassword) {
+            setSystemSettings(prev => ({ ...prev, maintenanceMode: !prev.maintenanceMode }));
+            setShowConfirm(false);
+            setConfirmPassword('');
+            toast.success(`Maintenance Mode ${!systemSettings.maintenanceMode ? 'Enabled' : 'Disabled'}`);
+        } else {
+            toast.error('Incorrect maintenance password');
+        }
+    };
+
+    const Toggle = ({ active, onToggle, label, description, isMaintenance }) => (
+        <div style={{ padding: '1rem 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>{label}</h4>
+                    <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: 0 }}>{description}</p>
+                </div>
+                <button
+                    onClick={() => onToggle()}
+                    style={{
+                        width: '44px',
+                        height: '24px',
+                        borderRadius: '12px',
+                        backgroundColor: active ? '#d32f2f' : '#333',
+                        border: 'none',
+                        position: 'relative',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                    }}
+                >
+                    <div style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        backgroundColor: '#fff',
+                        position: 'absolute',
+                        top: '3px',
+                        left: active ? '23px' : '3px',
+                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    }} />
+                </button>
             </div>
-            <button
-                onClick={() => onToggle()}
-                style={{
-                    width: '44px',
-                    height: '24px',
-                    borderRadius: '12px',
-                    backgroundColor: active ? '#d32f2f' : '#333',
-                    border: 'none',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                }}
-            >
+            {isMaintenance && showConfirm && (
                 <div style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    backgroundColor: '#fff',
-                    position: 'absolute',
-                    top: '3px',
-                    left: active ? '23px' : '3px',
-                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                }} />
-            </button>
+                    marginTop: '1rem',
+                    padding: '1rem',
+                    backgroundColor: '#111',
+                    borderRadius: '8px',
+                    border: '1px solid #222',
+                    display: 'flex',
+                    gap: '10px',
+                    alignItems: 'center'
+                }}>
+                    <input
+                        type="password"
+                        placeholder="Enter Maintenance Password to Confirm"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        style={{
+                            flex: 1,
+                            backgroundColor: '#050505',
+                            border: '1px solid #333',
+                            borderRadius: '6px',
+                            padding: '8px 12px',
+                            color: '#fff',
+                            fontSize: '0.85rem'
+                        }}
+                    />
+                    <button
+                        onClick={confirmToggle}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: '#d32f2f',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '0.85rem',
+                            fontWeight: 'bold',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Confirm
+                    </button>
+                    <button
+                        onClick={() => { setShowConfirm(false); setConfirmPassword(''); }}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: 'transparent',
+                            color: '#888',
+                            border: '1px solid #333',
+                            borderRadius: '6px',
+                            fontSize: '0.85rem',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            )}
         </div>
     );
 
@@ -273,6 +351,7 @@ const Settings = () => {
                                 description="Prevent users from accessing the platform during updates"
                                 active={systemSettings.maintenanceMode}
                                 onToggle={() => handleSystemToggle('maintenanceMode')}
+                                isMaintenance={true}
                             />
                             <div style={{ height: '1px', backgroundColor: '#1a1a1a' }} />
                             <Toggle
