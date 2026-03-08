@@ -48,9 +48,9 @@ function AppContent() {
     };
 
     checkMaintenance();
-    const interval = setInterval(checkMaintenance, 30000);
+    const interval = setInterval(checkMaintenance, 60000); // 60 seconds
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user?.role, user?._id, user?.id]);
 
   const isLoginPage = location.pathname === '/login';
 

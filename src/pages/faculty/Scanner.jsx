@@ -14,6 +14,13 @@ const FacultyScanner = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const isProcessingRef = React.useRef(false); // keep ref for immediate sync check
 
+    const loadEventDetails = React.useCallback(async () => {
+        const result = await fetchEventDetails(selectedEvent._id);
+        if (result.success) {
+            setDetailedEvent(result.data);
+        }
+    }, [fetchEventDetails, selectedEvent?._id]);
+
     useEffect(() => {
         if (selectedEvent) {
             loadEventDetails();
@@ -21,13 +28,6 @@ const FacultyScanner = () => {
             setDetailedEvent(null);
         }
     }, [selectedEvent, loadEventDetails]);
-
-    const loadEventDetails = React.useCallback(async () => {
-        const result = await fetchEventDetails(selectedEvent._id);
-        if (result.success) {
-            setDetailedEvent(result.data);
-        }
-    }, [fetchEventDetails, selectedEvent?._id]);
 
     useEffect(() => {
         let scanner = null;
