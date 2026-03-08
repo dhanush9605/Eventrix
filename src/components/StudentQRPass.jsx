@@ -1,18 +1,44 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../context/AuthContext';
-import { User, ShieldCheck, Download } from 'lucide-react';
+import { User, ShieldCheck, Download, Loader2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 const StudentQRPass = () => {
     const { user } = useAuth();
+    const [downloading, setDownloading] = useState(false);
+    const passRef = useRef(null);
 
     if (!user) return null;
 
     // The QR data is just the student ID
     const qrData = user.studentId || 'N/A';
 
+    const handleDownload = async () => {
+        if (!passRef.current) return;
+        setDownloading(true);
+
+        try {
+            const canvas = await html2canvas(passRef.current, {
+                scale: 2, // High resolution
+                backgroundColor: '#0a0505',
+                useCORS: true
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = `Eventrix_Pass_${user.studentId || 'N_A'}.png`;
+            link.click();
+        } catch (error) {
+            console.error('Failed to download pass:', error);
+        } finally {
+            setDownloading(false);
+        }
+    };
+
     return (
-        <div style={{
+        <div ref={passRef} style={{
             backgroundColor: '#0a0505',
             border: '1px solid #1a1a1a',
             borderRadius: '16px',
@@ -32,7 +58,7 @@ const StudentQRPass = () => {
                 color: '#d32f2f'
             }}>
                 <ShieldCheck size={20} />
-                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Institutional Pass</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Eventrix Pass</span>
             </div>
 
             <div style={{
@@ -73,23 +99,30 @@ const StudentQRPass = () => {
                 </div>
             </div>
 
-            <button style={{
-                marginTop: '1.5rem',
-                width: '100%',
-                padding: '10px',
-                backgroundColor: '#111',
-                border: '1px solid #222',
-                color: '#fff',
-                borderRadius: '8px',
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                cursor: 'pointer'
-            }}>
-                <Download size={14} /> Download Pass
+            <button
+                data-html2canvas-ignore="true"
+                onClick={handleDownload}
+                disabled={downloading}
+                style={{
+                    marginTop: '1.5rem',
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#111',
+                    border: '1px solid #222',
+                    color: '#fff',
+                    borderRadius: '8px',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: downloading ? 'not-allowed' : 'pointer',
+                    opacity: downloading ? 0.7 : 1
+                }}
+            >
+                {downloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                {downloading ? 'Downloading...' : 'Download Pass'}
             </button>
         </div>
     );

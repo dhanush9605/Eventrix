@@ -30,7 +30,6 @@ const Sidebar = ({ role }) => {
             { id: 'create-event', label: 'Create Event', icon: Plus, path: '/faculty/create-event' },
             { id: 'manage-events', label: 'Manage Events', icon: Calendar, path: '/faculty/manage-events' },
             { id: 'scanner', label: 'Attendance Scanner', icon: Camera, path: '/faculty/scanner' },
-            { id: 'approvals', label: 'Approvals', icon: FileCheck, path: '/faculty/approvals' },
         ],
         admin: [
             { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '/admin/overview' },

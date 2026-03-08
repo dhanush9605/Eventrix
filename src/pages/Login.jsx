@@ -34,7 +34,7 @@ const Login = () => {
         e.preventDefault();
         setError('');
 
-        const res = await login({ email, password });
+        const res = await login({ email, password, role: activeRole });
         if (!res.success) {
             setError(res.message);
         }
@@ -49,7 +49,7 @@ const Login = () => {
                 setError('Google sign-in did not return a token. Please try again.');
                 return;
             }
-            const res = await googleAuth(null, accessToken);
+            const res = await googleAuth(null, accessToken, activeRole);
             if (res.success) {
                 // Navigate logic handled by useEffect
             } else if (res.isNew) {
@@ -323,11 +323,9 @@ const Login = () => {
                 )}
             </div>
 
-            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#666', maxWidth: '400px', textAlign: 'center' }}>
-                By logging in, you agree to Eventrix's <a href="#" style={{ color: '#aaa' }}>Terms of Service</a> and <a href="#" style={{ color: '#aaa' }}>Privacy Policy</a>.
-            </p>
 
             <p style={{ marginTop: '2rem', color: '#444', fontSize: '0.7rem' }}>
+
                 © 2026 EVENTRIX COLLEGE SYSTEMS. PREMIUM VARIANT 1.0
             </p>
             {/* Google Completion Modal */}

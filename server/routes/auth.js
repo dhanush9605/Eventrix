@@ -1,11 +1,13 @@
 import express from 'express';
 import User from '../models/User.js';
 import Counter from '../models/Counter.js';
+import Settings from '../models/Settings.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { body, validationResult } from 'express-validator';
 import axios from 'axios';
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -83,8 +85,22 @@ router.post('/register', registerValidation, async (req, res) => {
     try {
         const { name, email, password, role, department, year } = req.body;
 
+        // Check Registration Toggles
+        const settings = await Settings.findOne();
+        if (role === 'student' && settings && !settings.studentRegistration) {
+            return res.status(403).json({ message: 'Student registration is currently disabled.' });
+        }
+        if (role === 'faculty' && settings && !settings.facultyRegistration) {
+            return res.status(403).json({ message: 'Faculty registration is currently disabled.' });
+        }
+
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'User already exists' });
+
+        // Enforce faculty domain restriction
+        if (role === 'faculty' && !email.toLowerCase().endsWith('@vjcet.org')) {
+            return res.status(403).json({ message: 'Faculty registration strictly requires a @vjcet.org email address.' });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -118,18 +134,26 @@ router.post('/register', registerValidation, async (req, res) => {
 // Login
 router.post('/login', [
     body('email').isEmail().normalizeEmail(),
-    body('password').notEmpty()
+    body('password').notEmpty(),
+    body('role').isIn(['student', 'faculty', 'admin']).withMessage('Invalid role selected')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ message: 'Invalid inputs' });
+        return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
         const existingUser = await User.findOne({ email });
         if (!existingUser) return res.status(404).json({ message: 'User does not exist' });
+
+        // Enforce role-based login
+        if (existingUser.role !== role) {
+            return res.status(403).json({
+                message: `This account is registered as ${existingUser.role}. Please use the ${existingUser.role.charAt(0).toUpperCase() + existingUser.role.slice(1)} login tab.`
+            });
+        }
 
         if (existingUser.status === 'Blocked') {
             return res.status(403).json({ message: 'Account is blocked. Contact admin.' });
@@ -149,7 +173,7 @@ router.post('/login', [
 // Google Auth Init
 router.post('/google', async (req, res) => {
     try {
-        const { credential, accessToken } = req.body;
+        const { credential, accessToken, role } = req.body;
         let email, name, picture, googleId;
 
         if (credential && typeof credential === 'string' && credential.length > 0) {
@@ -191,6 +215,14 @@ router.post('/google', async (req, res) => {
             if (existingUser.status === 'Blocked') {
                 return res.status(403).json({ message: 'Account is blocked. Contact admin.' });
             }
+
+            // Enforce role-based login for Google Auth
+            if (role && existingUser.role !== role) {
+                return res.status(403).json({
+                    message: `This Google account is registered as ${existingUser.role}. Please use the ${existingUser.role.charAt(0).toUpperCase() + existingUser.role.slice(1)} login tab.`
+                });
+            }
+
             const token = jwt.sign({ email: existingUser.email, id: existingUser._id, role: existingUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
             return res.status(200).json({ result: existingUser, token });
         } else {
@@ -219,8 +251,22 @@ router.post('/google/complete', [
     try {
         const { name, email, googleId, picture, role, department, year } = req.body;
 
+        // Check Registration Toggles
+        const settings = await Settings.findOne();
+        if (role === 'student' && settings && !settings.studentRegistration) {
+            return res.status(403).json({ message: 'Student registration is currently disabled.' });
+        }
+        if (role === 'faculty' && settings && !settings.facultyRegistration) {
+            return res.status(403).json({ message: 'Faculty registration is currently disabled.' });
+        }
+
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'User already exists' });
+
+        // Enforce faculty domain restriction for Google Auth
+        if (role === 'faculty' && !email.toLowerCase().endsWith('@vjcet.org')) {
+            return res.status(403).json({ message: 'Faculty accounts can only be created with a @vjcet.org email address.' });
+        }
 
         // Generate Unique ID
         let uniqueIdData = {};
@@ -247,6 +293,39 @@ router.post('/google/complete', [
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong' });
         console.error(error);
+    }
+});
+
+// Update Profile
+router.put('/profile', auth, async (req, res) => {
+    try {
+        const { name, email, bio, year, department, notifications } = req.body;
+        const userId = req.user.id;
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        if (name) user.name = name;
+        if (email) {
+            const existingUser = await User.findOne({ email });
+            if (existingUser && existingUser._id.toString() !== userId) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+            user.email = email;
+        }
+        if (bio !== undefined) user.bio = bio;
+        if (year) user.year = year;
+        if (department) user.department = department;
+        if (notifications) user.notifications = notifications;
+
+        await user.save();
+
+        const token = jwt.sign({ email: user.email, id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(200).json({ result: user, token });
+    } catch (error) {
+        console.error("Profile Update Error:", error);
+        res.status(500).json({ message: 'Error updating profile' });
     }
 });
 

@@ -224,4 +224,20 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// Get Events Attended by Student
+router.get('/attended/:studentId', async (req, res) => {
+    try {
+        const { studentId } = req.params;
+        // Find events where this studentId is in the attendance array
+        const events = await Event.find({
+            "attendance.studentId": studentId
+        }).sort({ date: -1 });
+
+        res.status(200).json(events);
+    } catch (error) {
+        console.error("Error fetching attended events:", error);
+        res.status(500).json({ message: 'Error fetching attended events' });
+    }
+});
+
 export default router;

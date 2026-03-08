@@ -3,6 +3,7 @@ import { User, Mail, Lock, Eye, EyeOff, GraduationCap, ChevronRight, X } from 'l
 import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
+import * as api from '../services/api';
 
 const RegisterStudent = () => {
     const { user, register, googleAuth, googleAuthComplete } = useAuth();
@@ -21,6 +22,8 @@ const RegisterStudent = () => {
     const [googleData, setGoogleData] = useState(null);
     const [deptForGoogle, setDeptForGoogle] = useState('Computer Science');
     const [semesterForGoogle, setSemesterForGoogle] = useState('S1');
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [fetchingSettings, setFetchingSettings] = useState(true);
 
     // Redirect if already logged in
     React.useEffect(() => {
@@ -31,6 +34,20 @@ const RegisterStudent = () => {
             navigate(dashboardPath, { replace: true });
         }
     }, [user, navigate]);
+
+    React.useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const { data } = await api.getSettings();
+                setRegistrationEnabled(data.studentRegistration);
+            } catch (err) {
+                console.error('Failed to fetch settings:', err);
+            } finally {
+                setFetchingSettings(false);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -308,8 +325,8 @@ const RegisterStudent = () => {
                         </p>
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '6px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 'bold' }}>
-                        Create Student Account <ChevronRight size={18} />
+                    <button type="submit" disabled={!registrationEnabled || fetchingSettings} className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '6px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 'bold', opacity: (!registrationEnabled || fetchingSettings) ? 0.6 : 1, cursor: (!registrationEnabled || fetchingSettings) ? 'not-allowed' : 'pointer' }}>
+                        {fetchingSettings ? 'Checking status...' : registrationEnabled ? <>Create Student Account <ChevronRight size={18} /></> : 'Registration Disabled'}
                     </button>
                 </form>
 
@@ -323,6 +340,7 @@ const RegisterStudent = () => {
                     <button
                         type="button"
                         onClick={() => loginWithGoogle()}
+                        disabled={!registrationEnabled || fetchingSettings}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -336,9 +354,10 @@ const RegisterStudent = () => {
                             fontSize: '0.9rem',
                             fontWeight: '600',
                             color: '#444',
-                            cursor: 'pointer',
+                            cursor: (!registrationEnabled || fetchingSettings) ? 'not-allowed' : 'pointer',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            opacity: (!registrationEnabled || fetchingSettings) ? 0.6 : 1
                         }}
                     >
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px', height: '18px' }} />

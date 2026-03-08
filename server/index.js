@@ -9,6 +9,8 @@ import eventRoutes from './routes/events.js';
 import adminRoutes from './routes/admin.js';
 import feedbackRoutes from './routes/feedback.js';
 import departmentRoutes from './routes/departments.js';
+import settingsRoutes from './routes/settings.js';
+import maintenance from './middleware/maintenance.js';
 import seedAdmin from './scripts/createAdmin.js';
 
 dotenv.config();
@@ -18,7 +20,9 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(helmet()); // Security Headers
+app.use(helmet({
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
+})); // Security Headers with Google Login support
 app.use(express.json());
 app.use(cors({
     origin: ['http://localhost:5173', 'http://127.0.0.1:5173', process.env.CLIENT_URL],
@@ -33,6 +37,9 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api/', limiter);
+
+// Maintenance Mode Middleware
+app.use('/api', maintenance);
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventrix')
@@ -56,6 +63,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/departments', departmentRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/', (req, res) => {
     res.send('Eventrix Backend is running');

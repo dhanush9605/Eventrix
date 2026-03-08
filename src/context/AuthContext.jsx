@@ -32,9 +32,9 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const googleAuth = async (credential, accessToken) => {
+    const googleAuth = async (credential, accessToken, role) => {
         try {
-            const { data } = await api.googleAuth(credential, accessToken);
+            const { data } = await api.googleAuth(credential, accessToken, role);
             if (data?.result) {
                 // User exists, log them in
                 setUser(data.result);
@@ -60,13 +60,22 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateUser = (userData, token) => {
+        const existing = JSON.parse(localStorage.getItem('eventrix_user'));
+        const finalToken = token || existing?.token;
+        const completeUserData = { ...userData, token: finalToken };
+
+        setUser(completeUserData);
+        localStorage.setItem('eventrix_user', JSON.stringify(completeUserData));
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('eventrix_user');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, googleAuth, googleAuthComplete, logout }}>
+        <AuthContext.Provider value={{ user, login, register, googleAuth, googleAuthComplete, updateUser, logout }}>
             {children}
         </AuthContext.Provider>
     );

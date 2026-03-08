@@ -189,7 +189,8 @@ const CreateEvent = () => {
         color: '#fff',
         fontSize: '0.95rem',
         outline: 'none',
-        transition: 'border-color 0.2s'
+        transition: 'border-color 0.2s',
+        colorScheme: 'dark', // Fixes native dark mode icon colors for date/time pickers
     };
 
     const sectionTitleStyle = {

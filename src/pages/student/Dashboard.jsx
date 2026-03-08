@@ -38,8 +38,8 @@ const StudentDashboard = () => {
         { label: 'Certificates', value: certificatesCount.toString(), subtext: `${certificatesCount} earned`, icon: Award, color: '#fff', path: '/student/certificates' }
     ];
 
-    const handleJoinSession = (eventName) => {
-        alert(`Joining session for: ${eventName}`);
+    const handleJoinSession = () => {
+        navigate('/student/events');
     };
 
     return (
@@ -52,23 +52,14 @@ const StudentDashboard = () => {
                 marginBottom: '3rem'
             }}>
                 {metrics.map((m, i) => (
-                    <div key={i} style={{
+                    <div key={i} className="hover-card" style={{
                         backgroundColor: '#0a0505',
                         border: '1px solid #1a1a1a',
                         borderRadius: '12px',
                         padding: 'clamp(1.5rem, 3vw, 2rem)',
                         position: 'relative',
-                        transition: 'transform 0.2s ease, border-color 0.2s ease',
                         cursor: 'pointer'
                     }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.borderColor = '#333';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.borderColor = '#1a1a1a';
-                        }}
                         onClick={() => m.path && navigate(m.path)}
                     >
                         <span style={{ display: 'block', fontSize: '0.85rem', color: '#666', marginBottom: '1.5rem' }}>{m.label}</span>
@@ -158,7 +149,7 @@ const StudentDashboard = () => {
                 gap: '1.5rem'
             }}>
                 {liveEvents.map((e, i) => (
-                    <div key={i} style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
+                    <div key={i} className="hover-card" style={{ backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
                         <div style={{ position: 'relative', height: '180px' }}>
                             {e.bannerImage ? (
                                 <img src={e.bannerImage} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />

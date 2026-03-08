@@ -97,7 +97,7 @@ const StudentEvents = () => {
             {/* Events Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                 {filteredEvents.map(event => (
-                    <div key={event._id} style={{
+                    <div key={event._id} className="hover-card" style={{
                         backgroundColor: '#0a0505',
                         border: '1px solid #1a1a1a',
                         borderRadius: '12px',

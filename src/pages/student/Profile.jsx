@@ -91,7 +91,7 @@ const StudentProfile = () => {
                 {/* Right Column: QR Pass */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '4px' }}>Institutional Digital Pass</h2>
+                        <h2 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '4px' }}>Eventrix Digital Pass</h2>
                         <p style={{ fontSize: '0.8rem', color: '#666' }}>Show this QR to faculty for attendance</p>
                     </div>
 

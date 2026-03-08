@@ -3,6 +3,7 @@ import { User, Mail, Lock, Eye, EyeOff, LayoutGrid, ChevronDown, MoveRight, Grad
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
+import * as api from '../services/api';
 
 const RegisterFaculty = () => {
     const { user, register, googleAuth, googleAuthComplete } = useAuth();
@@ -19,6 +20,8 @@ const RegisterFaculty = () => {
     const [showGoogleModal, setShowGoogleModal] = useState(false);
     const [googleData, setGoogleData] = useState(null);
     const [deptForGoogle, setDeptForGoogle] = useState('Engineering');
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [fetchingSettings, setFetchingSettings] = useState(true);
 
     // Redirect if already logged in
     React.useEffect(() => {
@@ -29,6 +32,20 @@ const RegisterFaculty = () => {
             navigate(dashboardPath, { replace: true });
         }
     }, [user, navigate]);
+
+    React.useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const { data } = await api.getSettings();
+                setRegistrationEnabled(data.facultyRegistration);
+            } catch (err) {
+                console.error('Failed to fetch settings:', err);
+            } finally {
+                setFetchingSettings(false);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -264,7 +281,7 @@ const RegisterFaculty = () => {
                         </p>
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{
+                    <button type="submit" disabled={!registrationEnabled || fetchingSettings} className="btn btn-primary" style={{
                         width: '100%',
                         padding: '1rem',
                         borderRadius: '6px',
@@ -274,11 +291,13 @@ const RegisterFaculty = () => {
                         gap: '8px',
                         fontSize: '1rem',
                         fontWeight: 'bold',
-                        backgroundColor: themeColor,
+                        backgroundColor: registrationEnabled ? themeColor : '#ccc',
                         border: 'none',
-                        boxShadow: `0 10px 20px ${themeColor}20`
+                        boxShadow: registrationEnabled ? `0 10px 20px ${themeColor}20` : 'none',
+                        opacity: (!registrationEnabled || fetchingSettings) ? 0.6 : 1,
+                        cursor: (!registrationEnabled || fetchingSettings) ? 'not-allowed' : 'pointer'
                     }}>
-                        Create Faculty Account <MoveRight size={20} />
+                        {fetchingSettings ? 'Checking status...' : registrationEnabled ? <>Create Faculty Account <MoveRight size={20} /></> : 'Registration Disabled'}
                     </button>
                 </form>
 

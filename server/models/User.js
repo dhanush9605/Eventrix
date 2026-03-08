@@ -15,6 +15,12 @@ const userSchema = new mongoose.Schema({
         default: 'Active'
     },
     department: { type: String, required: true },
+    bio: { type: String },
+    notifications: {
+        email: { type: Boolean, default: true },
+        push: { type: Boolean, default: false },
+        weekly: { type: Boolean, default: false }
+    },
 
     // Specific Fields
     studentId: { type: String, unique: true, sparse: true }, // e.g., STU-2026-0001

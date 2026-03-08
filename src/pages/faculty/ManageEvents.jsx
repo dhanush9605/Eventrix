@@ -40,7 +40,7 @@ const ManageEvents = () => {
                 alert("Failed to fetch registrations.");
                 setIsModalOpen(false);
             }
-        } catch (error) {
+        } catch {
             alert("Error fetching registrations.");
             setIsModalOpen(false);
         } finally {

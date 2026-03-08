@@ -40,7 +40,7 @@ const StudentRegistrations = () => {
                         const event = reg.eventDetails || {}; // Handle missing event details
 
                         return (
-                            <div key={reg.id} style={{
+                            <div key={reg.id} className="hover-card" style={{
                                 backgroundColor: '#0a0505',
                                 border: '1px solid #1a1a1a',
                                 borderRadius: '12px',

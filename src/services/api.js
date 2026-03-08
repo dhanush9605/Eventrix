@@ -17,8 +17,9 @@ API.interceptors.request.use((req) => {
 
 export const login = (formData) => API.post('/auth/login', formData);
 export const register = (formData) => API.post('/auth/register', formData);
-export const googleAuth = (credential, accessToken) => API.post('/auth/google', { credential, accessToken });
+export const googleAuth = (credential, accessToken, role) => API.post('/auth/google', { credential, accessToken, role });
 export const googleAuthComplete = (formData) => API.post('/auth/google/complete', formData);
+export const updateProfile = (formData) => API.put('/auth/profile', formData);
 
 // Events
 export const createEvent = (eventData) => API.post('/events', eventData);
@@ -27,6 +28,7 @@ export const getEvents = (facultyId) => API.get(`/events?facultyId=${facultyId |
 export const getEventDetails = (id) => API.get(`/events/${id}/details`);
 export const markAttendance = (eventId, studentId) => API.post(`/events/${eventId}/attendance`, { studentId });
 export const registerForEvent = (eventId, studentId, utr) => API.post(`/events/${eventId}/register`, { studentId, utr });
+export const getAttendedEvents = (studentId) => API.get(`/events/attended/${studentId}`);
 
 // Admin
 export const getAdminStats = () => API.get('/admin/stats');
@@ -49,3 +51,7 @@ export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
 export const submitFeedback = (feedbackData) => API.post('/feedback', feedbackData);
 export const getEventFeedback = (eventId) => API.get(`/feedback/event/${eventId}`);
 export const getFeedbackStats = () => API.get('/feedback/stats');
+
+// Global Settings
+export const getSettings = () => API.get('/settings');
+export const updateSettings = (settingsData) => API.put('/settings', settingsData);

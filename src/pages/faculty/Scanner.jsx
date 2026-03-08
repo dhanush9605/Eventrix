@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useEvents } from '../../context/EventContext';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { Camera, CheckCircle, XCircle, Search, AlertCircle, RefreshCw } from 'lucide-react';
+import { Camera, CheckCircle, XCircle, Search, AlertCircle, RefreshCw, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const FacultyScanner = () => {
     const { events, markAttendance, fetchEventDetails } = useEvents();
@@ -19,14 +20,14 @@ const FacultyScanner = () => {
         } else {
             setDetailedEvent(null);
         }
-    }, [selectedEvent]);
+    }, [selectedEvent, loadEventDetails]);
 
-    const loadEventDetails = async () => {
+    const loadEventDetails = React.useCallback(async () => {
         const result = await fetchEventDetails(selectedEvent._id);
         if (result.success) {
             setDetailedEvent(result.data);
         }
-    };
+    }, [fetchEventDetails, selectedEvent?._id]);
 
     useEffect(() => {
         let scanner = null;
@@ -75,13 +76,49 @@ const FacultyScanner = () => {
                 });
             }
         };
-    }, [isScanning, isProcessing, selectedEvent, markAttendance]);
+    }, [isScanning, isProcessing, selectedEvent, markAttendance, loadEventDetails]);
 
     const resetScanner = () => {
         setScanResult(null);
         setIsProcessing(false);
         isProcessingRef.current = false;
         setIsScanning(true);
+    };
+
+    const exportToExcel = () => {
+        if (!detailedEvent || !detailedEvent.attendance || detailedEvent.attendance.length === 0) {
+            alert("No attendance data to export.");
+            return;
+        }
+
+        const workbook = XLSX.utils.book_new();
+
+        // 1. Create Event Details Sheet
+        const eventDetailsData = [
+            { Field: 'Event Title', Value: detailedEvent.title },
+            { Field: 'Category', Value: detailedEvent.category },
+            { Field: 'Date', Value: detailedEvent.date },
+            { Field: 'Time', Value: detailedEvent.time },
+            { Field: 'Location', Value: detailedEvent.location },
+            { Field: 'Total Attended', Value: detailedEvent.attendance.length }
+        ];
+        const detailsSheet = XLSX.utils.json_to_sheet(eventDetailsData);
+        XLSX.utils.book_append_sheet(workbook, detailsSheet, "Event Details");
+
+        // 2. Create Attendance Sheet
+        const attendanceData = detailedEvent.attendance.map(att => ({
+            Name: att.studentName || 'Unknown',
+            'Student ID': att.studentId,
+            Department: att.department || 'Unknown',
+            Year: att.year || 'Unknown',
+            'Time Marked': new Date(att.markedAt).toLocaleString()
+        }));
+        const attendanceSheet = XLSX.utils.json_to_sheet(attendanceData);
+        XLSX.utils.book_append_sheet(workbook, attendanceSheet, "Attendance List");
+
+        // Format filename: EventName_Attendance.xlsx
+        const fileName = `${selectedEvent.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_attendance.xlsx`;
+        XLSX.writeFile(workbook, fileName);
     };
 
     const facultyEvents = events; // In a real app, filter events created by this faculty
@@ -254,9 +291,17 @@ const FacultyScanner = () => {
                         {/* Attendance List */}
                         {detailedEvent && detailedEvent.attendance && detailedEvent.attendance.length > 0 && (
                             <div style={{ marginTop: '2rem', textAlign: 'left', backgroundColor: '#0a0505', border: '1px solid #1a1a1a', borderRadius: '16px', padding: '1.5rem', animation: 'fadeIn 0.3s ease' }}>
-                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
-                                    <CheckCircle size={18} color="#4caf50" /> Successfully Marked ({detailedEvent.attendance.length})
-                                </h3>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', margin: 0 }}>
+                                        <CheckCircle size={18} color="#4caf50" /> Successfully Marked ({detailedEvent.attendance.length})
+                                    </h3>
+                                    <button
+                                        onClick={exportToExcel}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#d32f2f', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                    >
+                                        <Download size={14} /> Export Data
+                                    </button>
+                                </div>
                                 <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                                         <thead>

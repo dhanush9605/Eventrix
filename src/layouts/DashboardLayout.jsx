@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
-import { Bell, Search, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const DashboardLayout = ({ children, role, title, showTopBar = true }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -93,37 +93,8 @@ const DashboardLayout = ({ children, role, title, showTopBar = true }) => {
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', flex: '1', justifyContent: 'flex-end' }}>
-                            {/* Search Bar - Hidden on small mobile */}
-                            <div className="hide-mobile" style={{ position: 'relative', flex: '0 1 auto' }}>
-                                <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#444' }} size={16} />
-                                <input
-                                    type="text"
-                                    placeholder={role === 'admin' ? "Search..." : "Search analytics..."}
-                                    style={{
-                                        backgroundColor: '#0a0a0a',
-                                        border: '1px solid #1a1a1a',
-                                        borderRadius: '8px',
-                                        padding: '10px 1rem 10px 2.5rem',
-                                        color: '#fff',
-                                        width: role === 'admin' ? 'min(380px, 30vw)' : 'min(280px, 25vw)',
-                                        fontSize: '0.85rem'
-                                    }}
-                                />
-                            </div>
-
                             {/* Action Buttons */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ position: 'relative', cursor: 'pointer' }}>
-                                    <Bell size={20} color="#666" />
-                                    <span style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', backgroundColor: '#d32f2f', borderRadius: '50%', border: '2px solid #000' }}></span>
-                                </div>
-
-                                {role === 'faculty' && (
-                                    <button className="btn btn-primary hide-mobile" style={{ padding: '8px 20px', fontSize: '0.75rem' }}>
-                                        EXPORT DATA
-                                    </button>
-                                )}
-
                                 {role === 'student' && (
                                     <div className="hide-mobile" style={{ textAlign: 'right' }}>
                                         <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', color: '#666', letterSpacing: '0.05em' }}>COMPUTER SCIENCE - READ ONLY</span>
