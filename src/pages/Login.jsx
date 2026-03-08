@@ -61,7 +61,9 @@ const Login = () => {
         },
         onError: (err) => {
             console.error('Google login error:', err);
-            setError('Login Failed');
+            // The standard Google OAuth component might just return a generic error if the popup is closed,
+            // but for backend rejects (like 403), googleAuth already handles returning res.message.
+            setError(err?.message || 'Google Login Failed or was cancelled.');
         }
     });
 
