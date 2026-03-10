@@ -17,6 +17,8 @@ dotenv.config();
 // Trigger restart for env update
 
 const app = express();
+// Trust the first proxy in front of Express (e.g., Render)
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5001;
 
 // Middleware
@@ -34,7 +36,8 @@ app.use(cors({
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 500, // Increased limit for development/maintenance checks
-    message: 'Too many requests from this IP, please try again after 15 minutes'
+    message: 'Too many requests from this IP, please try again after 15 minutes',
+    validate: { xForwardedForHeader: false } // Prevent express-rate-limit from crashing the app due to reverse proxy IP spoofing checks
 });
 app.use('/api/', limiter);
 
