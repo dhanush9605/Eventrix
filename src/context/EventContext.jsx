@@ -32,7 +32,7 @@ export const EventProvider = ({ children }) => {
                     // For now, let's just make the API call flexible. 
                     // To fetch ALL events for students, pass undefined/null if the API supports it.
                     // The backend currently filters IF facultyId is provided. 
-                    const filterId = user.role === 'faculty' ? (user._id || user.id || '') : '';
+                    const filterId = user.role === 'faculty' ? (user.facultyId || user._id || user.id || '') : '';
                     const { data } = await api.getEvents(filterId);
                     setEvents(data);
                 } catch (error) {
@@ -49,7 +49,7 @@ export const EventProvider = ({ children }) => {
 
     const addEvent = async (eventData) => {
         try {
-            const facultyId = user._id || user.id;
+            const facultyId = user.facultyId || user._id || user.id;
 
             let payload = eventData;
             // If it's FormData, append facultyId

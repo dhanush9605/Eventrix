@@ -29,7 +29,10 @@ const userSchema = new mongoose.Schema({
 
     // Google Auth
     googleId: { type: String, unique: true, sparse: true },
-    picture: { type: String }
+    picture: { type: String },
+
+    // Faculty specific organizing bodies (clubs, departments, etc.)
+    organizingBodies: [{ type: String }]
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

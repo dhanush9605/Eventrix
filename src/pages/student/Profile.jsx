@@ -19,9 +19,8 @@ const StudentProfile = () => {
 
     return (
         <DashboardLayout role="student" title="Student Profile">
-            <div style={{
+            <div className="profile-grid" style={{
                 display: 'grid',
-                gridTemplateColumns: '1.2fr 1fr',
                 gap: '2.5rem',
                 maxWidth: '1200px',
                 margin: '0 auto'
@@ -47,8 +46,8 @@ const StudentProfile = () => {
                         }}></div>
 
                         <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '2rem', color: '#fff' }}>Personal Information</h2>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
+                        
+                        <div className="info-grid" style={{ display: 'grid', gap: '2rem' }}>
                             {profileDetails.map((detail, index) => (
                                 <div key={index}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#666' }}>
@@ -95,7 +94,7 @@ const StudentProfile = () => {
                         <p style={{ fontSize: '0.8rem', color: '#666' }}>Show this QR to faculty for attendance</p>
                     </div>
 
-                    <div style={{ transform: 'scale(1.05)', marginTop: '1rem' }}>
+                    <div style={{ marginTop: '1rem' }}>
                         <StudentQRPass />
                     </div>
 
@@ -119,6 +118,32 @@ const StudentProfile = () => {
             </div>
 
             <style>{`
+                .profile-grid {
+                    grid-template-columns: 1.2fr 1fr;
+                }
+
+                .info-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                @media (max-width: 1024px) {
+                    .profile-grid {
+                        grid-template-columns: 1fr;
+                        gap: 2rem;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .info-grid {
+                        grid-template-columns: 1fr;
+                        gap: 1.5rem;
+                    }
+                    
+                    .profile-grid {
+                        gap: 1.5rem;
+                    }
+                }
+
                 @keyframes float {
                     0% { transform: translateY(0px); }
                     50% { transform: translateY(-10px); }

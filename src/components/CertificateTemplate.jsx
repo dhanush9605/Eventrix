@@ -50,7 +50,8 @@ const CertificateTemplate = forwardRef(({ certData, studentName, studentId }, re
                 top: 0,
                 fontFamily: "'Inter', sans-serif",
                 border: '20px solid #111',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                overflow: 'hidden'
             }}
         >
             <div style={{
@@ -60,7 +61,7 @@ const CertificateTemplate = forwardRef(({ certData, studentName, studentId }, re
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 position: 'relative',
                 overflow: 'hidden'
             }}>
@@ -75,51 +76,67 @@ const CertificateTemplate = forwardRef(({ certData, studentName, studentId }, re
                     borderRadius: '50%',
                 }} />
 
-                {/* Top Left Branding */}
                 <div style={{
-                    position: 'absolute',
-                    top: '40px',
-                    left: '40px',
+                    marginTop: '10px',
+                    marginBottom: '20px',
+                    width: '100%',
                     display: 'flex',
+                    justifyContent: 'center',
                     alignItems: 'center',
-                    opacity: 0.8
                 }}>
-                    <EventrixLogo height={24} />
+                    <img 
+                        src="/college-log.png" 
+                        alt="College Logo" 
+                        style={{ 
+                            height: '85px',
+                            maxWidth: '85%', 
+                            objectFit: 'contain' 
+                        }} 
+                    />
                 </div>
 
-                <div style={{ marginBottom: '25px', color: '#d32f2f' }}>
-                    <Award size={90} strokeWidth={1} />
+                {/* Top Right Branding - Eventrix */}
+                <div style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '25px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    opacity: 0.4
+                }}>
+                    <EventrixLogo height={12} />
                 </div>
 
                 <h1 style={{
-                    fontSize: '3rem',
+                    marginTop: '20px',
+                    fontSize: '2.5rem',
                     fontWeight: '300',
-                    letterSpacing: '8px',
+                    letterSpacing: '6px',
                     textTransform: 'uppercase',
-                    marginBottom: '15px'
+                    marginBottom: '10px'
                 }}>
                     Certificate
                 </h1>
-                <p style={{ color: '#888', fontStyle: 'italic', marginBottom: '50px', fontSize: '1.1rem' }}>
+                <p style={{ color: '#888', fontStyle: 'italic', marginBottom: '25px', fontSize: '1rem' }}>
                     of Participation and Achievement
                 </p>
-
-                <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '15px' }}>This is to certify that</p>
+ 
+                <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '10px' }}>This is to certify that</p>
                 <h2 style={{
-                    fontSize: '3.5rem',
+                    fontSize: '3rem',
                     fontWeight: '700',
                     color: '#fff',
-                    marginBottom: '15px',
-                    borderBottom: '3px solid #d32f2f',
-                    paddingBottom: '10px'
+                    marginBottom: '10px',
+                    borderBottom: '2px solid #d32f2f',
+                    paddingBottom: '5px'
                 }}>
                     {studentName}
                 </h2>
-                <p style={{ color: '#888', marginBottom: '50px', fontSize: '1.1rem' }}>ID: {studentId}</p>
-
-                <p style={{ textAlign: 'center', maxWidth: '600px', lineHeight: '1.8', color: '#aaa', marginBottom: '60px', fontSize: '1.1rem' }}>
+                <p style={{ color: '#888', marginBottom: '25px', fontSize: '1rem' }}>ID: {studentId}</p>
+ 
+                <p style={{ textAlign: 'center', maxWidth: '600px', lineHeight: '1.6', color: '#aaa', marginBottom: '30px', fontSize: '1rem' }}>
                     has successfully participated in the event <br />
-                    <strong style={{ color: '#fff', fontSize: '1.4rem' }}>"{certData.title}"</strong>, held on {certData.issueDate}.
+                    <strong style={{ color: '#fff', fontSize: '1.2rem' }}>"{certData.title}"</strong>, held on {certData.issueDate}.
                 </p>
 
                 {/* Bottom Section Layout */}

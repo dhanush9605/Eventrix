@@ -19,16 +19,17 @@ const FeaturedEvents = () => {
                         const month = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
                         const day = dateObj.getDate();
 
-                        return {
-                            id: event._id,
-                            title: event.title,
-                            location: event.location,
-                            date: `${month} ${day}`,
-                            category: event.category.toUpperCase(),
-                            image: event.bannerImage || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop", // Fallback image
-                            registrations: `${event.registrations ? event.registrations.length : 0} REGISTERED`
-                        };
-                    });
+                            return {
+                                id: event._id,
+                                title: event.title,
+                                location: event.location,
+                                date: `${month} ${day}`,
+                                category: event.category.toUpperCase(),
+                                organizingBody: event.organizingBody,
+                                image: event.bannerImage || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop", // Fallback image
+                                registrations: `${event.registrations ? event.registrations.length : 0} REGISTERED`
+                            };
+                        });
                 setEvents(formattedEvents.slice(0, 3)); // Show only 3 latest events
             } catch (error) {
                 console.error("Failed to fetch events:", error);
@@ -150,7 +151,12 @@ const FeaturedEvents = () => {
                                     }}>{event.date}</div>
                                 </div>
                                 <div style={{ padding: '1.5rem' }}>
-                                    <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{event.title}</h3>
+                                    <h3 style={{ fontSize: '1.25rem', marginBottom: '4px' }}>{event.title}</h3>
+                                    {event.organizingBody && (
+                                        <p style={{ fontSize: '0.7rem', fontWeight: '800', color: '#d32f2f', marginBottom: '12px', textTransform: 'uppercase' }}>
+                                            Organized by {event.organizingBody}
+                                        </p>
+                                    )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#a0a0a0', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                         {event.location}

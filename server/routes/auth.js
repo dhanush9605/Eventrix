@@ -8,6 +8,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { body, validationResult } from 'express-validator';
 import axios from 'axios';
 import auth from '../middleware/auth.js';
+import { sendWelcomeEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -121,6 +122,13 @@ router.post('/register', registerValidation, async (req, res) => {
             year: year || new Date().getFullYear().toString(),
             ...uniqueIdData
         });
+
+        // Send Welcome Email
+        try {
+            await sendWelcomeEmail(newUser);
+        } catch (mailError) {
+            console.error("Failed to send welcome email:", mailError);
+        }
 
         const token = jwt.sign({ email: newUser.email, id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
@@ -287,6 +295,13 @@ router.post('/google/complete', [
             ...uniqueIdData
         });
 
+        // Send Welcome Email
+        try {
+            await sendWelcomeEmail(newUser);
+        } catch (mailError) {
+            console.error("Failed to send welcome email:", mailError);
+        }
+
         const token = jwt.sign({ email: newUser.email, id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(201).json({ result: newUser, token });
@@ -299,7 +314,7 @@ router.post('/google/complete', [
 // Update Profile
 router.put('/profile', auth, async (req, res) => {
     try {
-        const { name, email, bio, year, department, notifications } = req.body;
+        const { name, email, bio, year, department, notifications, organizingBodies } = req.body;
         const userId = req.user.id;
 
         const user = await User.findById(userId);
@@ -317,6 +332,7 @@ router.put('/profile', auth, async (req, res) => {
         if (year) user.year = year;
         if (department) user.department = department;
         if (notifications) user.notifications = notifications;
+        if (organizingBodies) user.organizingBodies = organizingBodies;
 
         await user.save();
 

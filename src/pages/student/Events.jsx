@@ -64,8 +64,19 @@ const StudentEvents = () => {
     return (
         <DashboardLayout role="student" title="Events Directory">
             {/* Filters and Controls */}
-            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+            <div className="events-header" style={{ 
+                marginBottom: '2rem', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1.5rem'
+            }}>
+                <div style={{ 
+                    display: 'flex', 
+                    gap: '1rem',
+                    flexWrap: 'wrap'
+                }}>
                     {['all', 'Technical', 'Workshop', 'Cultural', 'Seminar'].map(f => (
                         <button
                             key={f}
@@ -86,11 +97,6 @@ const StudentEvents = () => {
                             {f}
                         </button>
                     ))}
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#666', fontSize: '0.9rem' }}>
-                    <Filter size={16} />
-                    <span>Sort by: Date</span>
                 </div>
             </div>
 
@@ -141,7 +147,12 @@ const StudentEvents = () => {
 
                         <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                             <div style={{ marginBottom: 'auto' }}>
-                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#fff' }}>{event.title}</h3>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '4px', color: '#fff' }}>{event.title}</h3>
+                                {event.organizingBody && (
+                                    <p style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#d32f2f', marginBottom: '12px' }}>
+                                        Organized by {event.organizingBody}
+                                    </p>
+                                )}
                                 <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '1.5rem', lineHeight: '1.5' }}>{event.description}</p>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -284,6 +295,18 @@ const StudentEvents = () => {
                     </div>
                 </div>
             )}
+            <style>{`
+                @media (max-width: 768px) {
+                    .events-header {
+                        justify-content: center !important;
+                        text-align: center;
+                    }
+                    
+                    .events-header > div {
+                        justify-content: center;
+                    }
+                }
+            `}</style>
         </DashboardLayout>
     );
 };

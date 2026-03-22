@@ -2,6 +2,7 @@ import express from 'express';
 import Event from '../models/Event.js';
 import User from '../models/User.js';
 import upload from '../config/cloudinary.js';
+import { sendEventUpdateEmail, sendRegistrationConfirmationEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.post('/', upload.fields([{ name: 'bannerImage', maxCount: 1 }, { name: 'p
         const {
             title, category, date, time, location, description,
             maxParticipants, deadline, isPaid, fee, upiId,
-            facultyId
+            facultyId, organizingBody
         } = req.body;
 
         // Get Cloudinary URLs if files were uploaded
@@ -30,8 +31,19 @@ router.post('/', upload.fields([{ name: 'bannerImage', maxCount: 1 }, { name: 'p
         const newEvent = await Event.create({
             title, category, date, time, location, description,
             maxParticipants, deadline, isPaid, fee, upiId,
-            paymentQr, bannerImage, facultyId
+            paymentQr, bannerImage, facultyId, organizingBody
         });
+
+        // Notify Users about New Event
+        try {
+            const usersToNotify = await User.find({ "notifications.email": true });
+            for (const user of usersToNotify) {
+                await sendEventUpdateEmail(user, newEvent);
+            }
+        } catch (mailError) {
+            console.error("Failed to send event creation notifications:", mailError);
+        }
+
         res.status(201).json(newEvent);
     } catch (error) {
         console.error("Error creating event:", error);
@@ -199,6 +211,16 @@ router.post('/:id/register', async (req, res) => {
         // Add to registrations
         event.registrations.push({ studentId, utr });
         await event.save();
+
+        // Send Registration Confirmation Email
+        try {
+            const student = await User.findOne({ studentId });
+            if (student) {
+                await sendRegistrationConfirmationEmail(student, event);
+            }
+        } catch (mailError) {
+            console.error("Failed to send registration confirmation email:", mailError);
+        }
 
         res.status(200).json({ success: true, message: 'Successfully registered' });
     } catch (error) {

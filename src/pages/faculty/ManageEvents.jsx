@@ -229,7 +229,12 @@ const ManageEvents = () => {
                                     </div>
                                 </div>
 
-                                <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '1rem' }}>{event.title}</h3>
+                                <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '4px' }}>{event.title}</h3>
+                                {event.organizingBody && (
+                                    <p style={{ fontSize: '0.8rem', fontWeight: '800', color: '#d32f2f', marginBottom: '1rem' }}>
+                                        Organized by {event.organizingBody}
+                                    </p>
+                                )}
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#666', fontSize: '0.85rem' }}>

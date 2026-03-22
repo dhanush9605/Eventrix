@@ -14,7 +14,8 @@ const Settings = () => {
         email: user?.email || '',
         bio: user?.bio || '',
         year: user?.year || '',
-        department: user?.department || ''
+        department: user?.department || '',
+        organizingBodies: user?.organizingBodies || []
     });
 
     const [systemSettings, setSystemSettings] = useState({
@@ -34,7 +35,8 @@ const Settings = () => {
                 email: user.email || '',
                 bio: user.bio || '',
                 year: user.year || '',
-                department: user.department || ''
+                department: user.department || '',
+                organizingBodies: user.organizingBodies || []
             });
         }
     }, [user]);
@@ -334,6 +336,109 @@ const Settings = () => {
                                     }}
                                 ></textarea>
                             </div>
+
+                            {/* Organizing Bodies Section for Faculty */}
+                            {role === 'faculty' && (
+                                <div style={{ gridColumn: 'span 2', marginTop: '1rem' }}>
+                                    <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Sliders size={18} color="#d32f2f" /> Organizing Bodies (Clubs / Depts)
+                                    </h3>
+                                    <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+                                        Add the departments or clubs you organize events for (e.g., IEEE, NSS, CS Dept). You can select these when creating an event.
+                                    </p>
+                                    
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '1rem' }}>
+                                        {(formData.organizingBodies || []).map((body, index) => (
+                                            <div key={index} style={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                gap: '8px', 
+                                                backgroundColor: '#1a1a1a', 
+                                                padding: '6px 12px', 
+                                                borderRadius: '20px',
+                                                border: '1px solid #333'
+                                            }}>
+                                                <span style={{ fontSize: '0.85rem', color: '#fff' }}>{body}</span>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newBodies = formData.organizingBodies.filter((_, i) => i !== index);
+                                                        setFormData(prev => ({ ...prev, organizingBodies: newBodies }));
+                                                    }}
+                                                    style={{ 
+                                                        background: 'none', 
+                                                        border: 'none', 
+                                                        color: '#666', 
+                                                        cursor: 'pointer',
+                                                        fontSize: '1.2rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        padding: 0
+                                                    }}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <input
+                                            id="newBodyInput"
+                                            type="text"
+                                            placeholder="Add new body (e.g. IEEE)"
+                                            style={{
+                                                flex: 1,
+                                                backgroundColor: '#111',
+                                                border: '1px solid #222',
+                                                borderRadius: '8px',
+                                                padding: '10px',
+                                                color: '#fff',
+                                                fontSize: '0.9rem'
+                                            }}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const val = e.target.value.trim();
+                                                    if (val && !(formData.organizingBodies || []).includes(val)) {
+                                                        setFormData(prev => ({ 
+                                                            ...prev, 
+                                                            organizingBodies: [...(prev.organizingBodies || []), val] 
+                                                        }));
+                                                        e.target.value = '';
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const input = document.getElementById('newBodyInput');
+                                                const val = input.value.trim();
+                                                if (val && !(formData.organizingBodies || []).includes(val)) {
+                                                    setFormData(prev => ({ 
+                                                        ...prev, 
+                                                        organizingBodies: [...(prev.organizingBodies || []), val] 
+                                                    }));
+                                                    input.value = '';
+                                                }
+                                            }}
+                                            style={{
+                                                padding: '10px 16px',
+                                                backgroundColor: '#333',
+                                                color: '#fff',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ) : (

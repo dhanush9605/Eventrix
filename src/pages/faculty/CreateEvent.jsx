@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useEvents } from '../../context/EventContext';
+import { useAuth } from '../../context/AuthContext';
 import {
     Calendar,
     MapPin,
@@ -17,7 +18,8 @@ import {
 const CreateEvent = () => {
     const navigate = useNavigate();
     const { id } = useParams(); // Get ID from URL if editing
-    const { addEvent, updateEvent, getEventById } = useEvents(); // Assuming getEventById is available and synchronous enough or we fetch
+    const { addEvent, updateEvent, getEventById } = useEvents(); 
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(!!id);
 
@@ -30,6 +32,7 @@ const CreateEvent = () => {
         description: '',
         maxParticipants: '',
         deadline: '',
+        organizingBody: '',
         isPaid: false,
         fee: '',
         upiId: '',
@@ -39,6 +42,16 @@ const CreateEvent = () => {
 
     const [qrPreview, setQrPreview] = useState(null);
     const [bannerPreview, setBannerPreview] = useState(null);
+
+    // Default organizingBody for new events
+    React.useEffect(() => {
+        if (!id && user && !formData.organizingBody) {
+            setFormData(prev => ({
+                ...prev,
+                organizingBody: user.department || ''
+            }));
+        }
+    }, [id, user, formData.organizingBody]);
 
     // Fetch data if editing
     React.useEffect(() => {
@@ -58,7 +71,8 @@ const CreateEvent = () => {
                     fee: event.fee || '',
                     upiId: event.upiId || '',
                     paymentQr: event.paymentQr, // Keep url
-                    bannerImage: event.bannerImage // Keep url
+                    bannerImage: event.bannerImage, // Keep url
+                    organizingBody: event.organizingBody || ''
                 });
                 setBannerPreview(event.bannerImage);
                 setQrPreview(event.paymentQr);
@@ -306,16 +320,41 @@ const CreateEvent = () => {
                                 </select>
                             </div>
                             <div>
-                                <label style={labelStyle}>Max Participants</label>
-                                <input
-                                    type="number"
-                                    name="maxParticipants"
-                                    value={formData.maxParticipants}
+                                <label style={labelStyle}>Organizing Body (Dept/Club)</label>
+                                <select
+                                    name="organizingBody"
+                                    value={formData.organizingBody}
                                     onChange={handleInputChange}
-                                    placeholder="e.g. 200"
                                     style={inputStyle}
-                                />
+                                    required
+                                >
+                                    <option value="">Select Organizer</option>
+                                    {/* Primary Department */}
+                                    <option value={user?.department}>{user?.department} (Dept)</option>
+                                    {/* Faculty's associated bodies from profile */}
+                                    {(user?.organizingBodies || []).map((body, idx) => (
+                                        <option key={idx} value={body}>{body}</option>
+                                    ))}
+                                    {/* Fallback if it's already set but not in the list (e.g. edited) */}
+                                    {formData.organizingBody && 
+                                     formData.organizingBody !== user?.department && 
+                                     !(user?.organizingBodies || []).includes(formData.organizingBody) && (
+                                        <option value={formData.organizingBody}>{formData.organizingBody}</option>
+                                    )}
+                                </select>
                             </div>
+                        </div>
+
+                        <div style={inputGroupStyle}>
+                            <label style={labelStyle}>Max Participants</label>
+                            <input
+                                type="number"
+                                name="maxParticipants"
+                                value={formData.maxParticipants}
+                                onChange={handleInputChange}
+                                placeholder="e.g. 200"
+                                style={inputStyle}
+                            />
                         </div>
 
                         <div style={inputGroupStyle}>

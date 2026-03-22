@@ -162,7 +162,12 @@ const StudentDashboard = () => {
                             </div>
                         </div>
                         <div style={{ padding: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{e.title}</h3>
+                            <h3 style={{ fontSize: '1.1rem', marginBottom: '4px' }}>{e.title}</h3>
+                            {e.organizingBody && (
+                                <p style={{ fontSize: '0.7rem', fontWeight: '800', color: '#d32f2f', marginBottom: '12px', textTransform: 'uppercase' }}>
+                                    {e.organizingBody}
+                                </p>
+                            )}
                             <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '2rem' }}>{e.location}</p>
                             <button
                                 onClick={() => handleJoinSession(e.title)}
@@ -208,7 +213,10 @@ const StudentDashboard = () => {
                                     <Calendar size={20} />
                                 </div>
                                 <div>
-                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '4px' }}>{u.eventDetails?.title || 'Unknown Event'}</h4>
+                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '2px' }}>{u.eventDetails?.title || 'Unknown Event'}</h4>
+                                    {u.eventDetails?.organizingBody && (
+                                        <p style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#d32f2f', marginBottom: '4px' }}>{u.eventDetails.organizingBody}</p>
+                                    )}
                                     <p style={{ fontSize: '0.75rem', color: '#666' }}>{u.eventDetails?.date || 'Date N/A'}</p>
                                 </div>
                             </div>

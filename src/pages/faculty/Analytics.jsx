@@ -60,6 +60,11 @@ const FacultyAnalytics = () => {
                             <div key={event._id} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: '#050505', borderRadius: '10px', border: '1px solid #111', gap: '1rem' }}>
                                 <div style={{ flex: '1 1 auto', minWidth: '150px' }}>
                                     <span style={{ display: 'block', fontWeight: 'bold', fontSize: '1rem' }}>{event.title}</span>
+                                    {event.organizingBody && (
+                                        <span style={{ display: 'block', fontSize: '0.75rem', color: '#d32f2f', fontWeight: 'bold', textTransform: 'uppercase', marginTop: '2px' }}>
+                                            {event.organizingBody}
+                                        </span>
+                                    )}
                                     <span style={{ fontSize: '0.85rem', color: '#666' }}>{event.date}</span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>

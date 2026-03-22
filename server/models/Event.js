@@ -15,6 +15,7 @@ const eventSchema = new mongoose.Schema({
     paymentQr: { type: String }, // Base64 or URL
     bannerImage: { type: String }, // Base64 or URL
     facultyId: { type: String, required: true }, // The faculty who created it
+    organizingBody: { type: String }, // e.g., CS, ECE, IEEE, NSS, IEDC
     status: { type: String, default: 'active' }, // active, inactive, completed
 
     // Array of student IDs (e.g., STU-2026-0001) who attended

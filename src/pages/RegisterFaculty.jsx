@@ -14,12 +14,12 @@ const RegisterFaculty = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        department: 'Engineering' // Default first option
+        department: 'Computer Science Engineering' // Updated default
     });
     const [error, setError] = useState('');
     const [showGoogleModal, setShowGoogleModal] = useState(false);
     const [googleData, setGoogleData] = useState(null);
-    const [deptForGoogle, setDeptForGoogle] = useState('Engineering');
+    const [deptForGoogle, setDeptForGoogle] = useState('Computer Science Engineering');
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
     const [fetchingSettings, setFetchingSettings] = useState(true);
 
@@ -241,15 +241,15 @@ const RegisterFaculty = () => {
                         <div style={{ position: 'relative' }}>
                             <LayoutGrid style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
                             <select name="department" onChange={handleChange} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem', backgroundColor: '#f9f9f9', appearance: 'none', color: '#666' }}>
-                                <option value="Engineering">Engineering</option>
-                                <option value="Computer Science">Computer Science</option>
-                                <option value="Computer Science and Design">Computer Science and Design</option>
-                                <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
-                                <option value="Information Technology">Information Technology</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Electrical">Electrical</option>
-                                <option value="Mechanical">Mechanical</option>
-                                <option value="Civil">Civil</option>
+                                <option value="Computer Science Engineering">Computer Science Engineering</option>
+                                <option value="Computer Science and Design Engineering">Computer Science and Design Engineering</option>
+                                <option value="Artificial Intelligence and Data Science Engineering">Artificial Intelligence and Data Science Engineering</option>
+                                <option value="Information Technology Engineering">Information Technology Engineering</option>
+                                <option value="Electronics Engineering">Electronics Engineering</option>
+                                <option value="Electrical Engineering">Electrical Engineering</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Clubs/Other">Clubs/Other</option>
                             </select>
                             <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
                         </div>
@@ -379,15 +379,15 @@ const RegisterFaculty = () => {
                                     }}
                                     required
                                 >
-                                    <option value="Engineering">Engineering</option>
-                                    <option value="Computer Science">Computer Science</option>
-                                    <option value="Computer Science and Design">Computer Science and Design</option>
-                                    <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
-                                    <option value="Information Technology">Information Technology</option>
-                                    <option value="Electronics">Electronics</option>
-                                    <option value="Electrical">Electrical</option>
-                                    <option value="Mechanical">Mechanical</option>
-                                    <option value="Civil">Civil</option>
+                                    <option value="Computer Science Engineering">Computer Science Engineering</option>
+                                    <option value="Computer Science and Design Engineering">Computer Science and Design Engineering</option>
+                                    <option value="Artificial Intelligence and Data Science Engineering">Artificial Intelligence and Data Science Engineering</option>
+                                    <option value="Information Technology Engineering">Information Technology Engineering</option>
+                                    <option value="Electronics Engineering">Electronics Engineering</option>
+                                    <option value="Electrical Engineering">Electrical Engineering</option>
+                                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                    <option value="Civil Engineering">Civil Engineering</option>
+                                    <option value="Clubs/Other">Clubs/Other</option>
                                 </select>
                             </div>
 
