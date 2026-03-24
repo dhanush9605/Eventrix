@@ -39,7 +39,12 @@ export const sendEmail = async (to, subject, text, html) => {
         console.log('Email sent: %s', info.messageId);
         return info;
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Error sending email:', {
+            message: error.message,
+            code: error.code,
+            response: error.response,
+            smtpCode: error.responseCode
+        });
         // We don't want to crash the app if email fails
         return null;
     }
