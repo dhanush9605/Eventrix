@@ -45,20 +45,22 @@ app.use('/api/', limiter);
 app.use('/api', maintenance);
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventrix')
-    .then(async () => {
+const connectDB = async () => {
+    if (mongoose.connection.readyState >= 1) return;
+    try {
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventrix');
         console.log('Connected to MongoDB');
         await seedAdmin();
-
-        // Only start server after successful DB connection
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-    })
-    .catch((err) => {
+    } catch (err) {
         console.error('MongoDB connection error:', err);
-        process.exit(1); // Exit if DB connection fails
-    });
+    }
+};
+
+// Middleware to ensure DB is connected for every request on Vercel
+app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -70,4 +72,11 @@ app.use('/api/settings', settingsRoutes);
 
 app.get('/', (req, res) => {
     res.send('Eventrix Backend is running');
+});
+
+// Start server
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
 });
