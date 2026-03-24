@@ -8,10 +8,16 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const transporter = nodemailer.createTransport({
+console.log('Email Service Config:', {
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: false, // true for 465, false for 587
+    secure: process.env.SMTP_PORT == 465 // Auto-switch secure based on port
+});
+
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_PORT == 465, // true for 465, false for 587
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
