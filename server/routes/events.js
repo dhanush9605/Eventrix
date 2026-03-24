@@ -34,15 +34,10 @@ router.post('/', upload.fields([{ name: 'bannerImage', maxCount: 1 }, { name: 'p
             paymentQr, bannerImage, facultyId, organizingBody
         });
 
-        // Notify Users about New Event
-        try {
-            const usersToNotify = await User.find({ "notifications.email": true });
-            for (const user of usersToNotify) {
-                await sendEventUpdateEmail(user, newEvent);
-            }
-        } catch (mailError) {
-            console.error("Failed to send event creation notifications:", mailError);
-        }
+        // Notify Users about New Event (Asynchronous)
+        User.find({ "notifications.email": true }).then(users => {
+            users.forEach(user => sendEventUpdateEmail(user, newEvent).catch(err => console.error("Event update mail error:", err)));
+        }).catch(err => console.error("Failed to fetch users for notification:", err));
 
         res.status(201).json(newEvent);
     } catch (error) {
@@ -212,15 +207,12 @@ router.post('/:id/register', async (req, res) => {
         event.registrations.push({ studentId, utr });
         await event.save();
 
-        // Send Registration Confirmation Email
-        try {
-            const student = await User.findOne({ studentId });
+        // Send Registration Confirmation Email (Asynchronous)
+        User.findOne({ studentId }).then(student => {
             if (student) {
-                await sendRegistrationConfirmationEmail(student, event);
+                sendRegistrationConfirmationEmail(student, event).catch(err => console.error("Registration mail error:", err));
             }
-        } catch (mailError) {
-            console.error("Failed to send registration confirmation email:", mailError);
-        }
+        }).catch(err => console.error("Failed to fetch student for confirmation:", err));
 
         res.status(200).json({ success: true, message: 'Successfully registered' });
     } catch (error) {

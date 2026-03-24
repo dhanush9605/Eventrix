@@ -1,31 +1,13 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('Email Service Config:', {
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_PORT == 465 // Auto-switch secure based on port
-});
-
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_PORT == 465, // true for 465, false for 587
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
+import axios from 'axios';
 
 /**
- * Send an email
+ * Send an email via Brevo API
  * @param {string} to - Recipient email
  * @param {string} subject - Email subject
  * @param {string} text - Plain text content
@@ -33,25 +15,36 @@ const transporter = nodemailer.createTransport({
  */
 export const sendEmail = async (to, subject, text, html) => {
     try {
-        const mailOptions = {
-            from: process.env.EMAIL_FROM || 'noreply@eventrix.com',
-            to,
-            subject,
-            text,
-            html
+        const apiKey = process.env.SMTP_PASS; // Using the same key variable
+        const senderEmail = process.env.EMAIL_FROM || 'noreply@eventrix.com';
+
+        if (!apiKey) {
+            console.error('Email Error: SMTP_PASS (Brevo API Key) is missing');
+            return null;
+        }
+
+        const data = {
+            sender: { email: senderEmail, name: 'Eventrix Team' },
+            to: [{ email: to }],
+            subject: subject,
+            htmlContent: html,
+            textContent: text
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent: %s', info.messageId);
-        return info;
-    } catch (error) {
-        console.error('Error sending email:', {
-            message: error.message,
-            code: error.code,
-            response: error.response,
-            smtpCode: error.responseCode
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', data, {
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            }
         });
-        // We don't want to crash the app if email fails
+
+        console.log('Email sent via API:', response.data.messageId);
+        return response.data;
+    } catch (error) {
+        console.error('Error sending email via API:', {
+            message: error.message,
+            response: error.response?.data || 'No response data'
+        });
         return null;
     }
 };
