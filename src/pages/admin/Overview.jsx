@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { Users, Calendar, Building, TrendingUp, Activity, Bell, X, ChevronRight, ChevronLeft, MapPin, Clock, HelpCircle } from 'lucide-react';
 import { getAdminStats, getAdminStatDetails } from '../../services/api';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 
 const AdminOverview = () => {
     const [stats, setStats] = useState({
@@ -179,22 +179,72 @@ const AdminOverview = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
                 {/* Main Chart Area */}
                 <div style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: '16px', padding: '2rem', height: '400px', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Registrations Over Time</h3>
-                        <Activity size={20} color="#666" />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                        <div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#fff', marginBottom: '4px' }}>Registrations Over Time</h3>
+                            <p style={{ fontSize: '0.75rem', color: '#666' }}>Daily growth of the student community</p>
+                        </div>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#d32f2f15', color: '#d32f2f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Activity size={18} />
+                        </div>
                     </div>
                     <div style={{ flex: 1, width: '100%', height: '100%' }}>
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                <XAxis dataKey="name" stroke="#666" tick={{ fill: '#666' }} />
-                                <YAxis stroke="#666" tick={{ fill: '#666' }} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
-                                    itemStyle={{ color: '#fff' }}
+                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorReg" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#d32f2f" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#d32f2f" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                                <XAxis 
+                                    dataKey="name" 
+                                    stroke="#444" 
+                                    tick={{ fill: '#666', fontSize: 11 }} 
+                                    axisLine={false} 
+                                    tickLine={false}
+                                    dy={10}
                                 />
-                                <Line type="monotone" dataKey="registrations" stroke="#d32f2f" strokeWidth={2} dot={{ r: 4, fill: '#d32f2f' }} activeDot={{ r: 8 }} />
-                            </LineChart>
+                                <YAxis 
+                                    stroke="#444" 
+                                    tick={{ fill: '#666', fontSize: 11 }} 
+                                    axisLine={false} 
+                                    tickLine={false}
+                                    allowDecimals={false}
+                                />
+                                <Tooltip
+                                    content={({ active, payload, label }) => {
+                                        if (active && payload && payload.length) {
+                                            return (
+                                                <div style={{ 
+                                                    backgroundColor: '#111', 
+                                                    border: '1px solid #333', 
+                                                    padding: '12px', 
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)'
+                                                }}>
+                                                    <p style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px', textTransform: 'uppercase' }}>{label}</p>
+                                                    <p style={{ color: '#fff', fontSize: '1rem', fontWeight: 'bold' }}>
+                                                        {payload[0].value} <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: '#d32f2f' }}>Registrations</span>
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="registrations" 
+                                    stroke="#d32f2f" 
+                                    strokeWidth={3}
+                                    fillOpacity={1} 
+                                    fill="url(#colorReg)" 
+                                    activeDot={{ r: 6, stroke: '#111', strokeWidth: 2, fill: '#d32f2f' }}
+                                    dot={{ r: 0 }}
+                                />
+                            </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>

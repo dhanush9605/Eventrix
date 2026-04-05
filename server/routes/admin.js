@@ -61,9 +61,18 @@ router.get('/stats', async (req, res) => {
         // 4. Recent Activity
         // Get last 5 events created
         const recentEvents = await Event.find().sort({ createdAt: -1 }).limit(5).lean();
+        
+        // Fetch specific faculty names
+        const facultyIds = [...new Set(recentEvents.map(e => e.facultyId))];
+        const faculties = await User.find({ facultyId: { $in: facultyIds } }, 'name facultyId').lean();
+        const facultyMap = faculties.reduce((acc, f) => {
+            acc[f.facultyId] = f.name;
+            return acc;
+        }, {});
+
         const mappedEvents = recentEvents.map(e => ({
             type: 'event',
-            user: 'Faculty', // We need to fetch faculty name ideally, but let's place holder
+            user: facultyMap[e.facultyId] || 'Faculty Member', 
             action: 'created a new event',
             target: e.title,
             time: e.createdAt
