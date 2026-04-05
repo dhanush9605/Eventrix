@@ -249,6 +249,8 @@ const RegisterFaculty = () => {
                                 <option value="Electrical Engineering">Electrical Engineering</option>
                                 <option value="Mechanical Engineering">Mechanical Engineering</option>
                                 <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="MBA">MBA</option>
+                                <option value="Hotel Management & Catering Technology">Hotel Management & Catering Technology</option>
                                 <option value="Clubs/Other">Clubs/Other</option>
                             </select>
                             <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} size={16} />
@@ -387,6 +389,8 @@ const RegisterFaculty = () => {
                                     <option value="Electrical Engineering">Electrical Engineering</option>
                                     <option value="Mechanical Engineering">Mechanical Engineering</option>
                                     <option value="Civil Engineering">Civil Engineering</option>
+                                    <option value="MBA">MBA</option>
+                                    <option value="Hotel Management & Catering Technology">Hotel Management & Catering Technology</option>
                                     <option value="Clubs/Other">Clubs/Other</option>
                                 </select>
                             </div>

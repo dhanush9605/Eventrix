@@ -212,7 +212,8 @@ export const EventProvider = ({ children }) => {
                 studentId: studentId,
                 status: reg.status,
                 timestamp: reg.registeredAt || reg.timestamp,
-                eventDetails: event
+                eventDetails: event,
+                attended: event.attendance?.some(a => a.studentId === studentId)
             };
         });
     }, [events]);

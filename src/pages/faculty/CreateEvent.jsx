@@ -15,6 +15,20 @@ import {
     Loader2
 } from 'lucide-react';
 
+const DEPARTMENTS = [
+    "Computer Science Engineering",
+    "Computer Science and Design Engineering",
+    "Artificial Intelligence and Data Science Engineering",
+    "Information Technology Engineering",
+    "Electronics Engineering",
+    "Electrical Engineering",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "MBA",
+    "Hotel Management & Catering Technology",
+    "Clubs/Other"
+];
+
 const CreateEvent = () => {
     const navigate = useNavigate();
     const { id } = useParams(); // Get ID from URL if editing
@@ -329,15 +343,21 @@ const CreateEvent = () => {
                                     required
                                 >
                                     <option value="">Select Organizer</option>
-                                    {/* Primary Department */}
-                                    <option value={user?.department}>{user?.department} (Dept)</option>
-                                    {/* Faculty's associated bodies from profile */}
-                                    {(user?.organizingBodies || []).map((body, idx) => (
-                                        <option key={idx} value={body}>{body}</option>
+                                    
+                                    {/* Full list of Departments */}
+                                    {DEPARTMENTS.map((dept, idx) => (
+                                        <option key={`dept-${idx}`} value={dept}>{dept}</option>
                                     ))}
-                                    {/* Fallback if it's already set but not in the list (e.g. edited) */}
+
+                                    {/* Faculty's associated bodies from profile if not in the main list */}
+                                    {(user?.organizingBodies || []).map((body, idx) => {
+                                        if (DEPARTMENTS.includes(body)) return null;
+                                        return <option key={`body-${idx}`} value={body}>{body}</option>;
+                                    })}
+                                    
+                                    {/* Fallback if it's already set but not in the lists */}
                                     {formData.organizingBody && 
-                                     formData.organizingBody !== user?.department && 
+                                     !DEPARTMENTS.includes(formData.organizingBody) && 
                                      !(user?.organizingBodies || []).includes(formData.organizingBody) && (
                                         <option value={formData.organizingBody}>{formData.organizingBody}</option>
                                     )}
