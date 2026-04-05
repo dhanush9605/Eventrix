@@ -126,8 +126,8 @@ const StudentRegistrations = () => {
                                             <QrCode size={16} /> View Ticket
                                         </button>
 
-                                        {/* Rate Event Button (Shown if event has passed) */}
-                                        {new Date(event.date) < new Date() && (
+                                        {/* Rate Event Button (Shown if event has passed AND student attended) */}
+                                        {new Date(event.date) < new Date() && reg.attended && (
                                             <button
                                                 onClick={() => setRatingEvent(event)}
                                                 style={{

@@ -296,6 +296,8 @@ const RegisterStudent = () => {
                                     <option value="Electrical Engineering">Electrical Engineering</option>
                                     <option value="Mechanical Engineering">Mechanical Engineering</option>
                                     <option value="Civil Engineering">Civil Engineering</option>
+                                    <option value="MBA">MBA</option>
+                                    <option value="Hotel Management & Catering Technology">Hotel Management & Catering Technology</option>
                                 </select>
                             </div>
                         </div>
@@ -430,6 +432,8 @@ const RegisterStudent = () => {
                                     <option value="Electrical Engineering">Electrical Engineering</option>
                                     <option value="Mechanical Engineering">Mechanical Engineering</option>
                                     <option value="Civil Engineering">Civil Engineering</option>
+                                    <option value="MBA">MBA</option>
+                                    <option value="Hotel Management & Catering Technology">Hotel Management & Catering Technology</option>
                                 </select>
                             </div>
 

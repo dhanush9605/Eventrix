@@ -13,10 +13,10 @@ router.post('/', async (req, res) => {
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event not found' });
 
-        // 2. Check if student is registered for this event
-        const isRegistered = event.registrations.some(reg => reg.studentId === studentId);
-        if (!isRegistered) {
-            return res.status(403).json({ message: 'You must be registered for this event to leave feedback.' });
+        // 2. Check if student attended this event
+        const hasAttended = event.attendance.some(a => a.studentId === studentId);
+        if (!hasAttended) {
+            return res.status(403).json({ message: 'You must have attended the event to leave feedback.' });
         }
 
         // 3. Create feedback
