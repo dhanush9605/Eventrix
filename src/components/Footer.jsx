@@ -19,6 +19,11 @@ const Footer = () => {
                         <p style={{ color: '#444', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>
                             © 2026 EVENTRIX SYSTEMS. ALL RIGHTS RESERVED.
                         </p>
+                        
+                        <a href="https://dhanush-rajesh.vercel.app/" target="_blank" rel="noopener noreferrer" className="developer-badge">
+                            <span className="label">Created by</span>
+                            <span className="name">DR</span>
+                        </a>
                     </div>
                 </div>
             </div>

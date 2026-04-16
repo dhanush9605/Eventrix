@@ -326,8 +326,7 @@ const Login = () => {
             </div>
 
 
-            <p style={{ marginTop: '2rem', color: '#444', fontSize: '0.7rem' }}>
-
+            <p style={{ marginTop: '2rem', color: '#444', fontSize: '0.7rem', textAlign: 'center' }}>
                 © 2026 EVENTRIX COLLEGE SYSTEMS. PREMIUM VARIANT 1.0
             </p>
             {/* Google Completion Modal */}
